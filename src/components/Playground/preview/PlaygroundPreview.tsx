@@ -1,206 +1,59 @@
-import {useCallback, useEffect, useRef, useState} from "react";
-import {usePlaygroundRootContext} from "@site/src/components/Playground";
-import styles from './PlaygroundPreview.module.css';
-import {getFullUrl} from "@site/src/utils/url";
-import { EditorType } from "@site/src/components/Playground/root/PlaygroundRootContext";
+import { useCallback, useEffect, useRef } from "react"
+import { usePlaygroundRootContext } from "@site/src/components/Playground"
+import { EditorPreview, EditorPreviewRef } from "@site/src/components/EditorPreview"
+import { getFullUrl } from "@site/src/utils/url"
+import { EditorType } from "@site/src/components/Playground/root/PlaygroundRootContext"
 
-declare global {
-    interface Window {
-        DocsAPI: any
-        connector: any
-        docEditor: any
-    }
-}
+type FileConfig = { ext: string; docType: string; url: string }
 
-const FILE_CONFIGS = {
+const FILE_CONFIGS: Record<EditorType, FileConfig> = {
     word: { ext: 'docx', docType: 'word', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.docx' },
     pdf: { ext: 'pdf', docType: 'pdf', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.pdf' },
     cell: { ext: 'xlsx', docType: 'cell', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.xlsx' },
-    slide: {
-        ext: 'pptx',
-        docType: 'slide',
-        url: 'https://static.onlyoffice.com/assets/docs/samples/demo.pptx',
-    },
-    form: {
-        ext: 'pdf',
-        docType: 'pdf',
-        url: 'https://static.onlyoffice.com/assets/docs/samples/demo-invoice.pdf',
-    },
+    slide: { ext: 'pptx', docType: 'slide', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.pptx' },
+    form: { ext: 'pdf', docType: 'pdf', url: 'https://static.onlyoffice.com/assets/docs/samples/demo-invoice.pdf' },
 }
 
-const getDocumentUrl = (
+function getDocumentUrl(
     templateUrl: string | null | undefined,
-    fileConfig: { ext: string; url: string },
+    fileConfig: FileConfig,
     editorType: EditorType
-): string => {
+): string {
     if (templateUrl === null) {
         const name = editorType === 'form' ? 'demo-invoice' : 'new'
         return `https://static.onlyoffice.com/assets/docs/samples/${name}.${fileConfig.ext}`
     }
-
-    if (templateUrl) {
-        return templateUrl
-    }
-
+    if (templateUrl) return templateUrl
     return fileConfig.url
 }
 
 export const PlaygroundPreview = () => {
-    const { theme, scriptValue, previewType, scriptType, editorType, documentServerUrl, documentServerSecret, templateUrl, hasInitialScript } = usePlaygroundRootContext()
+    const {
+        theme,
+        scriptValue,
+        previewType,
+        scriptType,
+        editorType,
+        documentServerUrl,
+        documentServerSecret,
+        templateUrl,
+        hasInitialScript,
+    } = usePlaygroundRootContext()
 
-    const containerRef = useRef(null)
-    const initializingRef = useRef(false)
-    const [isApiLoaded, setIsApiLoaded] = useState(false)
+    const editorRef = useRef<EditorPreviewRef>(null)
+    const connectorRef = useRef<any>(null)
     const initialScriptExecutedRef = useRef(!hasInitialScript)
 
-    const createJWT = useCallback(
-        async (payload: object): Promise<string> => {
-            if (!documentServerSecret) return ''
+    const scriptValueRef = useRef(scriptValue)
+    const scriptTypeRef = useRef(scriptType)
+    const editorTypeRef = useRef(editorType)
+    scriptValueRef.current = scriptValue
+    scriptTypeRef.current = scriptType
+    editorTypeRef.current = editorType
 
-            const header = {
-                typ: 'JWT',
-                alg: 'HS256',
-            }
-
-            const base64EncodeURL = (str: string): string => {
-                return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-            }
-
-            const encodedHeader = base64EncodeURL(JSON.stringify(header))
-            const encodedPayload = base64EncodeURL(JSON.stringify(payload))
-
-            const encoder = new TextEncoder()
-            const algorithm = { name: 'HMAC', hash: 'SHA-256' }
-
-            const key = await crypto.subtle.importKey('raw', encoder.encode(documentServerSecret), algorithm, false, [
-                'sign',
-            ])
-
-            const data = encoder.encode(`${encodedHeader}.${encodedPayload}`)
-            const signature = await crypto.subtle.sign(algorithm.name, key, data)
-            const hash = base64EncodeURL(String.fromCharCode(...new Uint8Array(signature)))
-
-            return `${encodedHeader}.${encodedPayload}.${hash}`
-        },
-        [documentServerSecret],
-    )
-
-    const destroyEditor = useCallback(() => {
-        if (window.connector) {
-            try {
-                window.connector.disconnect()
-            } catch (error) {
-                console.warn('Failed to disconnect connector:', error)
-            }
-            delete window.connector
-        }
-
-        if (window.docEditor) {
-            try {
-                window.docEditor.destroyEditor()
-            } catch (error) {
-                console.warn('Failed to destroy editor:', error)
-            }
-            delete window.docEditor
-        }
-    }, [])
-
-    const initEditor = useCallback(async () => {
-        if (!containerRef.current || !isApiLoaded || initializingRef.current) return
-
-        initializingRef.current = true
-
-        try {
-            destroyEditor()
-
-            containerRef.current.innerHTML = '<div id="placeholder" style="width:100%;height:100%;"></div>'
-
-            const fileConfig = FILE_CONFIGS[editorType] || FILE_CONFIGS.word
-
-            const config = {
-                document: {
-                    fileType: fileConfig.ext,
-                    key: "0" + Math.random(),
-                    title: `Example Document Title.${fileConfig.ext}`,
-                    url: getDocumentUrl(templateUrl, fileConfig, editorType),
-                },
-                documentType: fileConfig.docType,
-                type: previewType,
-                editorConfig: {
-                    callbackUrl: documentServerUrl + 'dummyCallback',
-                    user: {
-                        id: 'userID',
-                        name: 'Developer',
-                    },
-                    customization: {
-                        uiTheme: theme === 'dark' ? 'default-dark' : 'default-light',
-                        mobile: {
-                            disableForceDesktop:true,
-                        },
-                        features: {
-                            featuresTips: false,
-                        },
-                    },
-                    lang: 'en',
-                },
-                height: '100%',
-                width: '100%',
-                events: {
-                    onDocumentReady: () => {
-                        try {
-                            const pluginConfigUrl = getFullUrl("/plugin/config.json");
-
-                            window.connector = window.docEditor.createConnector();
-                            window.connector.callCommand(
-                                new Function(`Api.installDeveloperPlugin("${pluginConfigUrl}");`)
-                            );
-
-                            if (!initialScriptExecutedRef.current) {
-                                initialScriptExecutedRef.current = true
-                                executeCode(scriptValue, scriptType)
-                            }
-                        } catch (error) {
-                            console.error('Failed to initialize connector:', error)
-                        }
-                    }
-                }
-            }
-
-            if (!!documentServerSecret?.length) {
-                (config as any).token = await createJWT(config)
-            }
-
-            if (previewType === 'mobile') {
-                // NOTE:  Fixed positioning removes the element from normal document flow and positions it relative to the viewport, not the parent container.
-                const observer = new MutationObserver(() => {
-                    const iframe = containerRef.current?.querySelector('iframe')
-                    if (iframe) {
-                        iframe.style.position = 'absolute'
-                        iframe.style.top = '0'
-                        iframe.style.left = '0'
-                        observer.disconnect()
-                    }
-                })
-
-                if (containerRef.current) {
-                    observer.observe(containerRef.current, {
-                        childList: true,
-                        subtree: true
-                    })
-                }
-            }
-
-            window.docEditor = new window.DocsAPI.DocEditor('placeholder', config)
-        } catch (error) {
-            console.error('Failed to create editor:', error)
-        } finally {
-            initializingRef.current = false
-        }
-
-    }, [editorType, theme, previewType, documentServerUrl, documentServerSecret, createJWT, isApiLoaded, destroyEditor, templateUrl])
-
-    const executeCode = useCallback((code: string, type: string) => {
-        if (!window.connector) {
+    const executeCode = useCallback((script: string, type: string) => {
+        const connector = connectorRef.current
+        if (!connector) {
             console.log('Please wait for editor to load...')
             return
         }
@@ -208,88 +61,103 @@ export const PlaygroundPreview = () => {
         try {
             switch (type) {
                 case 'office-js-api':
-                    window.connector.callCommand(new Function(code))
+                    connector.callCommand(new Function(script))
                     break
-                case 'connector':
-                    const connectorFn = new Function('connector', code);
-                    connectorFn(window.connector);
+                case 'connector': {
+                    const fn = new Function('connector', script)
+                    fn(connector)
                     break
-                case 'plugin': {
-                    window.connector.executeMethod('SetPluginsOptions', [
-                        {
-                            'asc.{D764D084-C77A-4A3E-A157-A9A1E442BCFC}': {
-                                codeExecute: code,
-                            },
-                        },
+                }
+                case 'plugin':
+                    connector.executeMethod('SetPluginsOptions', [
+                        { 'asc.{D764D084-C77A-4A3E-A157-A9A1E442BCFC}': { codeExecute: script } },
                     ])
                     break
-                }
                 case 'builder': {
-                    var removeMethod = {
-                        "word": "Api.GetDocument().RemoveAllElements();",
-                        "cell": "Api.AddSheet(\"Sheet 1\");var sheets = Api.GetSheets(); for (var shInd = 0; shInd < sheets.length - 1; shInd++){ sheets[shInd].Delete(); }",
-                        "slide": "var oPresentation = Api.GetPresentation(); var nSlidesCount = oPresentation.GetSlidesCount(); for(var nSlideIdx = nSlidesCount - 1; nSlideIdx > -1; --nSlideIdx) { oPresentation.GetSlideByIndex(nSlideIdx).Delete(); } oPresentation.AddSlide(Api.CreateSlide());",
-                        "form": "Api.GetDocument().RemoveAllElements();"
-                    };
-                    var script = removeMethod[editorType] + code.replaceAll("builder.CreateFile", "").replaceAll("builder.SaveFile", "").replaceAll("builder.CloseFile()", "").replaceAll("\n", "");
-                    window.connector.callCommand(new Function(script));
-                    break;
-                }
-                default:
+                    const removeMethod: Record<string, string> = {
+                        word: 'Api.GetDocument().RemoveAllElements();',
+                        cell: 'Api.AddSheet("Sheet 1");var sheets = Api.GetSheets(); for (var shInd = 0; shInd < sheets.length - 1; shInd++){ sheets[shInd].Delete(); }',
+                        slide: 'var oPresentation = Api.GetPresentation(); var nSlidesCount = oPresentation.GetSlidesCount(); for(var nSlideIdx = nSlidesCount - 1; nSlideIdx > -1; --nSlideIdx) { oPresentation.GetSlideByIndex(nSlideIdx).Delete(); } oPresentation.AddSlide(Api.CreateSlide());',
+                        form: 'Api.GetDocument().RemoveAllElements();',
+                    }
+                    const builderScript =
+                        (removeMethod[editorTypeRef.current] ?? '') +
+                        script
+                            .replaceAll('builder.CreateFile', '')
+                            .replaceAll('builder.SaveFile', '')
+                            .replaceAll('builder.CloseFile()', '')
+                            .replaceAll('\n', '')
+                    connector.callCommand(new Function(builderScript))
                     break
+                }
             }
         } catch (error) {
             console.error('Error executing code:', error)
         }
-    }, [editorType])
+    }, [])
 
+    const buildConfig = useCallback(() => {
+        const fileConfig = FILE_CONFIGS[editorType] ?? FILE_CONFIGS.word
+        return {
+            document: {
+                fileType: fileConfig.ext,
+                key: '0' + Math.random(),
+                title: `Example Document Title.${fileConfig.ext}`,
+                url: getDocumentUrl(templateUrl, fileConfig, editorType),
+            },
+            documentType: fileConfig.docType,
+            type: previewType,
+            editorConfig: {
+                callbackUrl: documentServerUrl + 'dummyCallback',
+                user: { id: 'userID', name: 'Developer' },
+                customization: {
+                    uiTheme: theme === 'dark' ? 'default-dark' : 'default-light',
+                    mobile: { disableForceDesktop: true },
+                    features: { featuresTips: false },
+                },
+                lang: 'en',
+            },
+            height: '100%',
+            width: '100%',
+            events: {
+                onDocumentReady: () => {
+                    try {
+                        connectorRef.current = window.docEditor.createConnector()
+
+                        const pluginConfigUrl = getFullUrl('/plugin/config.json')
+                        connectorRef.current.callCommand(
+                            new Function(`Api.installDeveloperPlugin("${pluginConfigUrl}");`)
+                        )
+
+                        if (!initialScriptExecutedRef.current) {
+                            initialScriptExecutedRef.current = true
+                            executeCode(scriptValueRef.current, scriptTypeRef.current)
+                        }
+                    } catch (error) {
+                        console.error('Failed to initialize connector:', error)
+                    }
+                },
+            },
+        }
+    }, [editorType, previewType, templateUrl, theme, documentServerUrl, executeCode])
 
     useEffect(() => {
-        if (!documentServerUrl) return
-
-        const script = document.createElement('script')
-        script.src = `${documentServerUrl}web-apps/apps/api/documents/api.js`
-        script.async = true
-        script.onload = () => {
-            setIsApiLoaded(true)
-        }
-        script.onerror = () => {
-            console.error('Failed to load OnlyOffice API')
-        }
-
-        document.body.appendChild(script)
-
-        return () => {
-            destroyEditor()
-            if (document.body.contains(script)) {
-                document.body.removeChild(script)
-            }
-        }
-    }, [documentServerUrl, destroyEditor])
+        editorRef.current?.initEditor(buildConfig())
+    }, [buildConfig])
 
     useEffect(() => {
-        if (!isApiLoaded || !containerRef.current) return
-
-        initEditor().catch(error => console.error('Error initializing editor:', error))
-    }, [isApiLoaded])
-
-    useEffect(() => {
-        if (!isApiLoaded) return
-
-        initEditor().catch(error => console.error('Error reinitializing editor:', error))
-    }, [theme, previewType, editorType, initEditor])
-
-    useEffect(() => {
-        const handleRefresh = () => {
-            if (window.connector && !!scriptValue.length) {
-                executeCode(scriptValue, scriptType)
-            }
+        const handleRun = () => {
+            if (scriptValue) executeCode(scriptValue, scriptType)
         }
-
-        window.addEventListener('playground-run', handleRefresh)
-
-        return () => window.removeEventListener('playground-run', handleRefresh)
+        window.addEventListener('playground-run', handleRun)
+        return () => window.removeEventListener('playground-run', handleRun)
     }, [scriptValue, scriptType, executeCode])
 
-    return <div ref={containerRef} className={styles.PlaygroundPreviewContainer}/>
+    return (
+        <EditorPreview
+            ref={editorRef}
+            documentServerUrl={documentServerUrl}
+            documentServerSecret={documentServerSecret}
+        />
+    )
 }
