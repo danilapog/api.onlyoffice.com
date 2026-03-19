@@ -39,7 +39,7 @@ You need to [add the URL](/docspace/javascript-sdk/get-started/get-started.md#st
     </script>
   </head>
 
-  <body class="ex-batch-fill-from-template-pdf">
+  <body class="ex-pptx-build-presentation">
     <div class="panel" style="margin-bottom: 12px;">
       <details open>
         <summary><b>How to use</b></summary>
