@@ -259,8 +259,34 @@ The API JavaScript file can normally be found in the following DocSpace folder: 
 
 Add a script to initialize the [file selector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector).
 
-1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback) and save the selected file ID.
-2. Build the fill URL with `action=fill`.
+1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback). When the user selects a file, save its ID and build the fill URL with `action=fill`:
+
+    ``` ts
+    let selected = null
+
+    function onSelectCallback(e) {
+      const item = Array.isArray(e) ? e[0] : e
+      if (!item) return
+      const id = item?.id ?? item?.fileId ?? null
+      selected = { id: id ? String(id) : "", title: String(item?.title || "") }
+    }
+    ```
+
+2. Create a configuration for the file selector and initialize it with the [initFileSelector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector) method:
+
+    ``` ts
+    const config = {
+      frameId: "ds-frame",
+      width: "900px",
+      height: "520px",
+      theme: "base",
+      events: {
+        onSelectCallback,
+      },
+    }
+
+    const selectorInstance = DocSpace.SDK.initFileSelector(config)
+    ```
 
 ### 3. Open document in fill mode
 
