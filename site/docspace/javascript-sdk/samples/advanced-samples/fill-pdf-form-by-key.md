@@ -491,12 +491,43 @@ Create an HTML file. Add a file selector iframe, a hidden editor iframe, and a t
 <button id="clear">Clear</button>
 ```
 
+:::info
+The API JavaScript file can normally be found in the following DocSpace folder: **\{PORTAL_SRC\}/static/scripts/sdk/2.1.0/api.js** where **\{PORTAL_SRC\}** is the name of the server with the ONLYOFFICE DocSpace installed.
+:::
+
 ### 2. Initialize the file selector
 
 Add a script to initialize the [file selector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector).
 
-1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback) and save the selected file ID and extension.
-2. Disable **Fill** / **Clear** actions unless a **.pdf** file is selected.
+1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback). When the user selects a file, save its ID and extension:
+
+    ``` ts
+    let selected = null
+
+    function onSelectCallback(e) {
+      const item = Array.isArray(e) ? e[0] : e
+      if (!item) return
+      const id = item?.id ?? item?.fileId ?? null
+      const ext = item?.fileExst || item?.extension || item?.ext || ""
+      selected = { id: id ? String(id) : "", ext: String(ext) }
+    }
+    ```
+
+2. Create a configuration for the file selector and initialize it with the [initFileSelector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector) method:
+
+    ``` ts
+    const config = {
+      frameId: "ds-selector",
+      width: "900px",
+      height: "520px",
+      theme: "base",
+      events: {
+        onSelectCallback,
+      },
+    }
+
+    const selectorInstance = DocSpace.SDK.initFileSelector(config)
+    ```
 
 ### 3. Prepare the fill map
 
