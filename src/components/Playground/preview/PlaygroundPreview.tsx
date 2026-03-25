@@ -3,16 +3,9 @@ import { usePlaygroundRootContext } from "@site/src/components/Playground"
 import { EditorPreview, EditorPreviewRef } from "@site/src/components/EditorPreview"
 import { getFullUrl } from "@site/src/utils/url"
 import { EditorType } from "@site/src/components/Playground/root/PlaygroundRootContext"
+import { FILE_CONFIGS, SAMPLE_FILE_CONFIGS } from "../defaultScripts"
 
 type FileConfig = { ext: string; docType: string; url: string }
-
-const FILE_CONFIGS: Record<EditorType, FileConfig> = {
-    word: { ext: 'docx', docType: 'word', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.docx' },
-    pdf: { ext: 'pdf', docType: 'pdf', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.pdf' },
-    cell: { ext: 'xlsx', docType: 'cell', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.xlsx' },
-    slide: { ext: 'pptx', docType: 'slide', url: 'https://static.onlyoffice.com/assets/docs/samples/demo.pptx' },
-    form: { ext: 'pdf', docType: 'pdf', url: 'https://static.onlyoffice.com/assets/docs/samples/demo-invoice.pdf' },
-}
 
 function getDocumentUrl(
     templateUrl: string | null | undefined,
@@ -38,6 +31,7 @@ export const PlaygroundPreview = () => {
         documentServerSecret,
         templateUrl,
         hasInitialScript,
+        documentType,
     } = usePlaygroundRootContext()
 
     const editorRef = useRef<EditorPreviewRef>(null)
@@ -79,6 +73,7 @@ export const PlaygroundPreview = () => {
                         cell: 'Api.AddSheet("Sheet 1");var sheets = Api.GetSheets(); for (var shInd = 0; shInd < sheets.length - 1; shInd++){ sheets[shInd].Delete(); }',
                         slide: 'var oPresentation = Api.GetPresentation(); var nSlidesCount = oPresentation.GetSlidesCount(); for(var nSlideIdx = nSlidesCount - 1; nSlideIdx > -1; --nSlideIdx) { oPresentation.GetSlideByIndex(nSlideIdx).Delete(); } oPresentation.AddSlide(Api.CreateSlide());',
                         form: 'Api.GetDocument().RemoveAllElements();',
+                        pdf: 'let doc = Api.GetDocument();for(let i = doc.GetPagesCount()-1; i > 0; i--) {doc.RemovePage(i);} doc.AddPage(1);doc.RemovePage(0);',
                     }
                     const builderScript =
                         (removeMethod[editorTypeRef.current] ?? '') +
@@ -97,7 +92,8 @@ export const PlaygroundPreview = () => {
     }, [])
 
     const buildConfig = useCallback(() => {
-        const fileConfig = FILE_CONFIGS[editorType] ?? FILE_CONFIGS.word
+        const configs = documentType === 'sample' ? SAMPLE_FILE_CONFIGS : FILE_CONFIGS
+        const fileConfig = (configs[editorType] ?? configs.word) as FileConfig
         return {
             document: {
                 fileType: fileConfig.ext,
@@ -125,8 +121,15 @@ export const PlaygroundPreview = () => {
                         connectorRef.current = window.docEditor.createConnector()
 
                         const pluginConfigUrl = getFullUrl('/plugin/config.json')
+                        // TODO: Remove after release 9.4.0, as installDeveloperPlugin will be available directly on the connector object
+                        const installPluginShim: Record<string, string> = {
+                            word: 'gg.ud.yJj=gg.ud.installDeveloperPlugin;',
+                            pdf: 'gg.ud.yJj=gg.ud.installDeveloperPlugin;',
+                            cell: 'zi.je.Xok=zi.je.installDeveloperPlugin;',
+                            slide: '$g.le.Prj=$g.le.installDeveloperPlugin;',
+                        }
                         connectorRef.current.callCommand(
-                            new Function(`Api.installDeveloperPlugin("${pluginConfigUrl}");`)
+                            new Function(`${installPluginShim[fileConfig.docType] || ''}Api.installDeveloperPlugin("${pluginConfigUrl}");`)
                         )
 
                         if (!initialScriptExecutedRef.current) {
@@ -139,7 +142,7 @@ export const PlaygroundPreview = () => {
                 },
             },
         }
-    }, [editorType, previewType, templateUrl, theme, documentServerUrl, executeCode])
+    }, [editorType, documentType, previewType, templateUrl, theme, documentServerUrl, executeCode])
 
     useEffect(() => {
         editorRef.current?.initEditor(buildConfig())
