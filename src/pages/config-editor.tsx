@@ -7,7 +7,7 @@ import schema from '/schemas/config.json'
 import { EditorPreview, EditorPreviewRef } from '@site/src/components/EditorPreview'
 import { SplitPane } from '@site/src/components/SplitPane'
 import { ConfigEditor } from '@site/src/components/ConfigEditor'
-import styles from './config.module.css'
+import styles from './config-editor.module.css'
 
 const defaultConfig = {
     documentType: 'word',
