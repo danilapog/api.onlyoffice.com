@@ -1,5 +1,3 @@
-'use client'
-
 import * as Select from '@radix-ui/react-select'
 import { useCallback, useEffect, useRef } from 'react'
 import { useConfigEditorContext } from '../root/ConfigEditorRootContext'
@@ -85,6 +83,7 @@ export function ConfigEditorNode({ node }: Props) {
                 ]
                     .filter(Boolean)
                     .join(' ')}
+                title={node.schemaNode?.description}
             >
                 {node.key}
             </span>
@@ -112,8 +111,6 @@ export function ConfigEditorNode({ node }: Props) {
         </div>
     )
 }
-
-// ---- Inline value controls ----
 
 interface ValueControlProps {
     node: ConfigNode
@@ -160,8 +157,6 @@ function ValueControl({ node, onChange }: ValueControlProps) {
     return <span className={styles.unknownValue}>{String(node.value)}</span>
 }
 
-// ---- Custom text control (contentEditable span) ----
-
 interface TextControlProps {
     value: string
     onChange: (v: string) => void
@@ -195,8 +190,6 @@ function TextControl({ value, onChange }: TextControlProps) {
     )
 }
 
-// ---- Custom toggle (boolean) ----
-
 interface ToggleControlProps {
     checked: boolean
     onChange: (v: boolean) => void
@@ -214,8 +207,6 @@ function ToggleControl({ checked, onChange }: ToggleControlProps) {
         </button>
     )
 }
-
-// ---- Custom enum dropdown (Radix Select) ----
 
 interface EnumControlProps {
     value: string

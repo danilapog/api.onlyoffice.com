@@ -1,3 +1,6 @@
+import * as v from 'valibot'
+import { EditorConfigRootSchema } from '../config.schema'
+
 export type ConfigNodeType =
     | 'string'
     | 'number'
@@ -196,53 +199,15 @@ export function buildConfig(
 
 export function validateConfig(
     config: Record<string, unknown>,
-    schema: SchemaNode,
+    _schema: SchemaNode,
 ): Map<string, string> {
+    const result = v.safeParse(EditorConfigRootSchema, config)
+    if (result.success) return new Map()
     const errors = new Map<string, string>()
-
-    function walk(value: unknown, schemaNode: SchemaNode | undefined, path: string) {
-        if (!schemaNode || value === undefined) return
-
-        const resolved = resolveSchemaNode(schemaNode)
-        if (!resolved) return
-
-        if (resolved.enum !== undefined) {
-            if (!resolved.enum.includes(value)) {
-                errors.set(path, `Must be one of: ${resolved.enum.map(String).join(', ')}`)
-            }
-            return
-        }
-
-        const schemaType = resolved.type
-        if (schemaType) {
-            const expected = Array.isArray(schemaType) ? schemaType[0] : schemaType
-            const actual = inferType(value)
-            const actualMapped =
-                actual === 'number' ? (Number.isInteger(value) ? 'integer' : 'number') : actual
-            if (expected === 'integer' && actualMapped !== 'integer' && actual !== 'number') {
-                errors.set(path, `Expected integer, got ${actual}`)
-            } else if (expected !== 'integer' && expected !== actualMapped && actual !== expected) {
-                if (!(expected === 'number' && actual === 'number')) {
-                    errors.set(path, `Expected ${expected}, got ${actual}`)
-                }
-            }
-        }
-
-        if (
-            typeof value === 'object' &&
-            value !== null &&
-            !Array.isArray(value) &&
-            resolved.properties
-        ) {
-            const obj = value as Record<string, unknown>
-            for (const [k, v] of Object.entries(obj)) {
-                const childSchema = resolved.properties[k]
-                walk(v, childSchema, path ? `${path}.${k}` : k)
-            }
-        }
+    for (const issue of result.issues) {
+        const path = issue.path?.map((p) => String(p.key)).join('.') ?? ''
+        errors.set(path, issue.message)
     }
-
-    walk(config, schema, '')
     return errors
 }
 
