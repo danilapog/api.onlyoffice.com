@@ -45,6 +45,7 @@ export type ConfigEditorAction =
     | { type: 'TOGGLE_COLLAPSE'; id: string }
     | { type: 'SET_VALIDATION_ERRORS'; errors: Map<string, string> }
     | { type: 'RESET' }
+    | { type: 'IMPORT_CONFIG'; config: Record<string, unknown> }
 
 function resolveSchemaNode(schema: SchemaNode | undefined): SchemaNode | undefined {
     if (!schema) return undefined
@@ -284,6 +285,9 @@ export function configEditorReducer(
 
         case 'RESET':
             return buildInitialState(state.defaultConfig, state.schema, state.useSchemaDefaults)
+
+        case 'IMPORT_CONFIG':
+            return buildInitialState(action.config, state.schema, state.useSchemaDefaults)
 
         default:
             return state

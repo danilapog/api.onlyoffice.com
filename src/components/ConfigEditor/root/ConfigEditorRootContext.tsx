@@ -4,7 +4,8 @@ import type { ConfigEditorState, ConfigEditorAction } from './reducer'
 export interface ConfigEditorRootContext extends ConfigEditorState {
     dispatch: Dispatch<ConfigEditorAction>
     onApply: () => void
-    onExport: () => void
+    onCopy: () => Promise<void>
+    onImport: () => Promise<void>
 }
 
 export const ConfigEditorRootContext = createContext<ConfigEditorRootContext | undefined>(undefined)

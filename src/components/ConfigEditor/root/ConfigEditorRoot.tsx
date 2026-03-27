@@ -40,25 +40,30 @@ export function ConfigEditorRoot({
         onApply(buildConfig(state.nodes, state.commentedIds))
     }, [onApply, state.nodes, state.commentedIds])
 
-    const handleExport = useCallback(() => {
+    const handleCopy = useCallback(async () => {
         const config = buildConfig(state.nodes, state.commentedIds)
-        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'config.json'
-        a.click()
-        URL.revokeObjectURL(url)
+        await navigator.clipboard.writeText(JSON.stringify(config, null, 2))
     }, [state.nodes, state.commentedIds])
+
+    const handleImport = useCallback(async () => {
+        try {
+            const text = await navigator.clipboard.readText()
+            const config = JSON.parse(text) as Record<string, unknown>
+            dispatch({ type: 'IMPORT_CONFIG', config })
+        } catch {
+            alert('Failed to import: clipboard does not contain valid JSON.')
+        }
+    }, [dispatch])
 
     const contextValue = useMemo<ConfigEditorRootContextType>(
         () => ({
             ...state,
             dispatch,
             onApply: handleApply,
-            onExport: handleExport,
+            onCopy: handleCopy,
+            onImport: handleImport,
         }),
-        [state, handleApply, handleExport],
+        [state, handleApply, handleCopy, handleImport],
     )
 
     return <ConfigEditorRootContext.Provider value={contextValue} {...props} />

@@ -10,10 +10,19 @@ interface Props {
     node: ConfigNode
 }
 
+function isAncestorCommented(id: string, commentedIds: Set<string>): boolean {
+    const parts = id.split('.')
+    for (let i = 1; i < parts.length; i++) {
+        if (commentedIds.has(parts.slice(0, i).join('.'))) return true
+    }
+    return false
+}
+
 export function ConfigEditorNode({ node }: Props) {
     const { dispatch, commentedIds, collapsedIds, validationErrors } = useConfigEditorContext()
 
     const isCommented = commentedIds.has(node.id)
+    const isDimmed = isCommented || isAncestorCommented(node.id, commentedIds)
     const isCollapsed = collapsedIds.has(node.id)
     const error = validationErrors.get(node.id)
     const hasChildren = node.type === 'object' && (node.children?.length ?? 0) > 0
@@ -37,7 +46,7 @@ export function ConfigEditorNode({ node }: Props) {
         <div
             className={[
                 styles.row,
-                isCommented ? styles.commented : '',
+                isDimmed ? styles.commented : '',
                 error ? styles.hasError : '',
             ]
                 .filter(Boolean)
@@ -72,7 +81,7 @@ export function ConfigEditorNode({ node }: Props) {
                 className={[
                     styles.key,
                     error ? styles.keyError : '',
-                    isCommented ? styles.keyCommented : '',
+                    isDimmed ? styles.keyCommented : '',
                 ]
                     .filter(Boolean)
                     .join(' ')}
@@ -82,8 +91,8 @@ export function ConfigEditorNode({ node }: Props) {
 
             <span className={styles.colon}>:</span>
 
-            {/* Value area — shown when not commented and not an expandable object */}
-            {!isCommented && !hasChildren && (
+            {/* Value area — shown when not dimmed and not an expandable object */}
+            {!isDimmed && !hasChildren && (
                 <div className={styles.valueArea}>
                     <ValueControl node={node} onChange={handleValueChange} />
                 </div>

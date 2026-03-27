@@ -11,11 +11,7 @@ function flattenNodes(
     const result: ConfigNode[] = []
     for (const node of nodes) {
         result.push(node)
-        if (
-            node.children &&
-            !collapsedIds.has(node.id) &&
-            !commentedIds.has(node.id)
-        ) {
+        if (node.children && !collapsedIds.has(node.id)) {
             result.push(...flattenNodes(node.children, collapsedIds, commentedIds))
         }
     }
