@@ -11,12 +11,10 @@ export type ConfigNodeType =
     | 'unknown'
 
 export interface SchemaNode {
-    type?: string | string[]
+    type?: string
     enum?: unknown[]
-    oneOf?: SchemaNode[]
     anyOf?: SchemaNode[]
     properties?: Record<string, SchemaNode>
-    items?: SchemaNode
     description?: string
     examples?: unknown[]
     default?: unknown
@@ -38,7 +36,6 @@ export interface ConfigEditorState {
     collapsedIds: Set<string>
     validationErrors: Map<string, string>
     defaultConfig: Record<string, unknown>
-    schema: SchemaNode
     useSchemaDefaults: boolean
 }
 
@@ -50,9 +47,72 @@ export type ConfigEditorAction =
     | { type: 'RESET' }
     | { type: 'IMPORT_CONFIG'; config: Record<string, unknown> }
 
+// ---------------------------------------------------------------------------
+// Valibot schema → SchemaNode conversion (runs once at module load)
+// ---------------------------------------------------------------------------
+
+type AnyValibotSchema = Record<string, any>
+
+function getValibotMetadata(schema: AnyValibotSchema): { description?: string; examples?: unknown[]; default?: unknown } | undefined {
+    if (!Array.isArray(schema.pipe)) return undefined
+    for (const item of schema.pipe as AnyValibotSchema[]) {
+        if (item?.kind === 'metadata' && item.metadata != null) return item.metadata
+    }
+    return undefined
+}
+
+function extractSchemaFromValibot(raw: AnyValibotSchema): SchemaNode {
+    const schema: AnyValibotSchema = raw.type === 'optional' ? raw.wrapped : raw
+    const meta = getValibotMetadata(schema)
+    const node: SchemaNode = {}
+    if (meta?.description) node.description = meta.description
+    if (meta?.examples) node.examples = meta.examples
+    if (meta?.default !== undefined) node.default = meta.default
+
+    switch (schema.type) {
+        case 'object':
+            node.type = 'object'
+            node.properties = Object.fromEntries(
+                Object.entries<AnyValibotSchema>(schema.entries ?? {}).map(([k, val]) => [
+                    k,
+                    extractSchemaFromValibot(val),
+                ]),
+            )
+            break
+        case 'picklist':
+            node.type = 'string'
+            node.enum = schema.options ?? []
+            break
+        case 'boolean':
+            node.type = 'boolean'
+            break
+        case 'string':
+            node.type = 'string'
+            break
+        case 'number':
+            node.type = 'number'
+            break
+        case 'array':
+            node.type = 'array'
+            break
+        case 'union':
+            node.anyOf = (schema.options ?? []).map(extractSchemaFromValibot)
+            break
+        // function / unknown / etc — leave type undefined → inferred as 'unknown'
+    }
+
+    return node
+}
+
+const SCHEMA_TREE = extractSchemaFromValibot(EditorConfigRootSchema)
+
+// ---------------------------------------------------------------------------
+// Tree building
+// ---------------------------------------------------------------------------
+
 function resolveSchemaNode(schema: SchemaNode | undefined): SchemaNode | undefined {
     if (!schema) return undefined
-    const branches = schema.oneOf ?? schema.anyOf
+    const branches = schema.anyOf
     if (!branches) return schema
     // Prefer boolean branch; otherwise take first branch
     const bool = branches.find((b) => b.type === 'boolean')
@@ -66,7 +126,7 @@ function resolveSchemaNode(schema: SchemaNode | undefined): SchemaNode | undefin
 
 function inferType(value: unknown, schema?: SchemaNode): ConfigNodeType {
     if (schema?.type) {
-        const t = Array.isArray(schema.type) ? schema.type[0] : schema.type
+        const t = schema.type
         if (t === 'string') return 'string'
         if (t === 'number' || t === 'integer') return 'number'
         if (t === 'boolean') return 'boolean'
@@ -124,12 +184,10 @@ function buildNodes(
 
             if (val === undefined) {
                 // For objects that have nested properties, recurse with an empty base
-                const schemaType = resolvedSchema?.type
-                const t = Array.isArray(schemaType) ? schemaType[0] : schemaType
-                if (t === 'object' && resolvedSchema?.properties) {
+                if (resolvedSchema?.type === 'object' && resolvedSchema?.properties) {
                     val = {}
                 } else {
-                    continue // No default/example available — skip leaf
+                    continue // No example available — skip leaf
                 }
             }
         } else {
@@ -166,17 +224,15 @@ function buildNodes(
 }
 
 export function buildInitialState(
-    config: Record<string, unknown>,
-    schema: SchemaNode,
+    config: Record<string, unknown> = {},
     useSchemaDefaults = true,
 ): ConfigEditorState {
     return {
-        nodes: buildNodes(config, schema, '', 0, useSchemaDefaults),
+        nodes: buildNodes(config, SCHEMA_TREE, '', 0, useSchemaDefaults),
         commentedIds: new Set(),
         collapsedIds: new Set(),
         validationErrors: new Map(),
         defaultConfig: config,
-        schema,
         useSchemaDefaults,
     }
 }
@@ -197,10 +253,7 @@ export function buildConfig(
     return result
 }
 
-export function validateConfig(
-    config: Record<string, unknown>,
-    _schema: SchemaNode,
-): Map<string, string> {
+export function validateConfig(config: Record<string, unknown>): Map<string, string> {
     const result = v.safeParse(EditorConfigRootSchema, config)
     if (result.success) return new Map()
     const errors = new Map<string, string>()
@@ -249,10 +302,10 @@ export function configEditorReducer(
             return { ...state, validationErrors: action.errors }
 
         case 'RESET':
-            return buildInitialState(state.defaultConfig, state.schema, state.useSchemaDefaults)
+            return buildInitialState(state.defaultConfig, state.useSchemaDefaults)
 
         case 'IMPORT_CONFIG':
-            return buildInitialState(action.config, state.schema, state.useSchemaDefaults)
+            return buildInitialState(action.config, state.useSchemaDefaults)
 
         default:
             return state

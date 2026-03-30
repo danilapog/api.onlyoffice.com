@@ -30,21 +30,21 @@ const CommentGroupsSchema = v.pipe(
 
 const PermissionsSchema = v.pipe(
     v.object({
-        changeHistory: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Allows to display the Restore button when using the onRequestRestore event. Default: false. Deprecated since 5.5.', examples: [true] }))),
-        chat: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the chat functionality is enabled in the document. Default: true', examples: [true] }))),
+        changeHistory: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Allows to display the Restore button when using the onRequestRestore event. Default: false. Deprecated since 5.5.', examples: [true], default: false }))),
+        chat: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the chat functionality is enabled in the document. Default: true', examples: [true], default: true }))),
         comment: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be commented or not. Default coincides with edit parameter.', examples: [true] }))),
         commentGroups: v.optional(CommentGroupsSchema),
-        copy: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the content can be copied to the clipboard. Default: true', examples: [true] }))),
-        deleteCommentAuthorOnly: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user can delete only his/her comments. Default: false', examples: [true] }))),
-        download: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be downloaded or only viewed/edited online. Default: true', examples: [true] }))),
-        edit: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be edited or only viewed. Default: true', examples: [true] }))),
-        editCommentAuthorOnly: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user can edit only his/her comments. Default: false', examples: [true] }))),
+        copy: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the content can be copied to the clipboard. Default: true', examples: [true], default: true }))),
+        deleteCommentAuthorOnly: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user can delete only his/her comments. Default: false', examples: [true], default: false }))),
+        download: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be downloaded or only viewed/edited online. Default: true', examples: [true], default: true }))),
+        edit: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be edited or only viewed. Default: true', examples: [true], default: true }))),
+        editCommentAuthorOnly: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user can edit only his/her comments. Default: false', examples: [true], default: false }))),
         fillForms: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the forms can be filled. Default coincides with edit or review parameter.', examples: [true] }))),
-        modifyContentControl: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the content control settings can be changed. Default: true', examples: [true] }))),
-        modifyFilter: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the filter can be applied globally (true) or locally (false). Default: true', examples: [true] }))),
-        print: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be printed. Default: true', examples: [true] }))),
-        protect: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Protection tab on the toolbar is displayed. Default: true', examples: [true] }))),
-        rename: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Allows to display the Rename button. Default: false. Deprecated since 6.0.', examples: [true] }))),
+        modifyContentControl: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the content control settings can be changed. Default: true', examples: [true], default: true }))),
+        modifyFilter: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the filter can be applied globally (true) or locally (false). Default: true', examples: [true], default: true }))),
+        print: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be printed. Default: true', examples: [true], default: true }))),
+        protect: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Protection tab on the toolbar is displayed. Default: true', examples: [true], default: true }))),
+        rename: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Allows to display the Rename button. Default: false. Deprecated since 6.0.', examples: [true], default: false }))),
         review: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document can be reviewed. Default coincides with edit parameter.', examples: [true] }))),
         reviewGroups: v.optional(v.pipe(v.array(v.string()), v.metadata({ description: 'Defines the groups whose changes the user can accept/reject', examples: [['Group1', 'Group2', '']] }))),
         userInfoGroups: v.optional(v.pipe(v.array(v.string()), v.metadata({ description: 'Defines the groups of users whose information is displayed in the editors', examples: [['Group1', '']] }))),
@@ -80,7 +80,7 @@ const DocumentInfoSchema = v.pipe(
 const DocumentSchema = v.pipe(
     v.object({
         fileType: v.optional(v.pipe(FileTypeSchema, v.metadata({ description: 'Defines the type of the file for the source viewed or edited document. Must be lowercase.', examples: ['docx'] }))),
-        isForm: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the PDF file is a PDF form or a standard PDF file. Default: true', examples: [true] }))),
+        isForm: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the PDF file is a PDF form or a standard PDF file. Default: true', examples: [true], default: true }))),
         key: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the unique document identifier used by the service to recognize the document. Must be unique, max 128 characters. Allowed chars: 0-9, a-z, A-Z, -._=', examples: ['Khirz6zTPdfd7'] }))),
         referenceData: v.optional(v.pipe(
             v.object({
@@ -125,7 +125,7 @@ const TabBackgroundSchema = v.pipe(
         v.object({
             mode: v.optional(v.pipe(
                 v.picklist(['header', 'toolbar'] as const),
-                v.metadata({ description: 'The tab background mode. Default: header', examples: ['header'] }),
+                v.metadata({ description: 'The tab background mode. Default: header', examples: ['header'], default: 'header' }),
             )),
             change: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the tab background setting will be displayed', examples: [true] }))),
         }),
@@ -139,7 +139,7 @@ const TabStyleSchema = v.pipe(
         v.object({
             mode: v.optional(v.pipe(
                 v.picklist(['fill', 'line'] as const),
-                v.metadata({ description: 'The tab style mode. Default: fill', examples: ['fill'] }),
+                v.metadata({ description: 'The tab style mode. Default: fill', examples: ['fill'], default: 'fill' }),
             )),
             change: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the tab style setting will be displayed', examples: [true] }))),
         }),
@@ -149,8 +149,8 @@ const TabStyleSchema = v.pipe(
 
 const FeaturesSchema = v.pipe(
     v.object({
-        featuresTips: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if tooltips about new editor features will be displayed. Default: true', examples: [true] }))),
-        roles: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if role settings are disabled in pdf forms. Default: true', examples: [true] }))),
+        featuresTips: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if tooltips about new editor features will be displayed. Default: true', examples: [true], default: true }))),
+        roles: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if role settings are disabled in pdf forms. Default: true', examples: [true], default: true }))),
         spellcheck: v.optional(SpellcheckSchema),
         tabBackground: v.optional(TabBackgroundSchema),
         tabStyle: v.optional(TabStyleSchema),
@@ -159,19 +159,19 @@ const FeaturesSchema = v.pipe(
 )
 
 const LayoutHeaderSchema = v.object({
-    editMode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the header is displayed in edit mode. Default: true', examples: [true] }))),
-    save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save button is displayed. Default: true', examples: [true] }))),
-    user: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user name and avatar are displayed. Default: true', examples: [true] }))),
-    users: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the button with the editing users is displayed. Default: true', examples: [true] }))),
+    editMode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the header is displayed in edit mode. Default: true', examples: [true], default: true }))),
+    save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save button is displayed. Default: true', examples: [true], default: true }))),
+    user: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the user name and avatar are displayed. Default: true', examples: [true], default: true }))),
+    users: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the button with the editing users is displayed. Default: true', examples: [true], default: true }))),
 })
 
 const LayoutLeftMenuSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            mode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the initial value of the left panel visibility. Default: true', examples: [true] }))),
-            navigation: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Navigation button is displayed. Available for document editor only. Default: true', examples: [true] }))),
-            spellcheck: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Spellcheck button is displayed. Available for spreadsheet editor only. Default: true', examples: [true] }))),
+            mode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the initial value of the left panel visibility. Default: true', examples: [true], default: true }))),
+            navigation: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Navigation button is displayed. Available for document editor only. Default: true', examples: [true], default: true }))),
+            spellcheck: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Spellcheck button is displayed. Available for spreadsheet editor only. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the left menu settings' }),
@@ -181,7 +181,7 @@ const LayoutRightMenuSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            mode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the initial value of the right panel visibility. Default: true', examples: [true] }))),
+            mode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the initial value of the right panel visibility. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the right menu settings' }),
@@ -191,9 +191,9 @@ const LayoutStatusBarSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            actionStatus: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if an action status is displayed. Default: true', examples: [true] }))),
-            docLang: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if a button for choosing the document language is displayed. Default: true', examples: [true] }))),
-            textLang: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if a button for choosing the text language is displayed. Default: true', examples: [true] }))),
+            actionStatus: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if an action status is displayed. Default: true', examples: [true], default: true }))),
+            docLang: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if a button for choosing the document language is displayed. Default: true', examples: [true], default: true }))),
+            textLang: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if a button for choosing the text language is displayed. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the status bar settings' }),
@@ -203,7 +203,7 @@ const LayoutToolbarCollaborationSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            mailmerge: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the button for choosing the mail merge base is displayed. Default: true', examples: [true] }))),
+            mailmerge: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the button for choosing the mail merge base is displayed. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the Collaboration tab settings' }),
@@ -213,10 +213,10 @@ const LayoutToolbarFileSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            close: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Close menu option is displayed. Default: true', examples: [true] }))),
-            info: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Document info option is displayed. Default: true', examples: [true] }))),
-            save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save option is displayed. Default: true', examples: [true] }))),
-            settings: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Advanced settings option is displayed. Default: true', examples: [true] }))),
+            close: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Close menu option is displayed. Default: true', examples: [true], default: true }))),
+            info: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Document info option is displayed. Default: true', examples: [true], default: true }))),
+            save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save option is displayed. Default: true', examples: [true], default: true }))),
+            settings: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Advanced settings option is displayed. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the File tab settings' }),
@@ -226,7 +226,7 @@ const LayoutToolbarViewSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            navigation: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Navigation button is displayed. Available for document editor only. Default: true', examples: [true] }))),
+            navigation: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Navigation button is displayed. Available for document editor only. Default: true', examples: [true], default: true }))),
         }),
     ]),
     v.metadata({ description: 'Defines the View tab settings' }),
@@ -237,14 +237,14 @@ const LayoutToolbarSchema = v.pipe(
         v.boolean(),
         v.object({
             collaboration: v.optional(LayoutToolbarCollaborationSchema),
-            draw: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Draw tab is displayed. Default: true', examples: [true] }))),
+            draw: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Draw tab is displayed. Default: true', examples: [true], default: true }))),
             file: v.optional(LayoutToolbarFileSchema),
             home: v.optional(v.pipe(v.object({}), v.metadata({ description: 'Defines the Home tab settings. This tab cannot be hidden.' }))),
-            layout: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Layout tab is displayed. Available for document and spreadsheet editors. Default: true', examples: [true] }))),
-            plugins: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Plugins tab is displayed. Default: true', examples: [true] }))),
-            protect: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Protection tab is displayed. Default: true', examples: [true] }))),
-            references: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the References tab is displayed. Available for document editor only. Default: true', examples: [true] }))),
-            save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save button on the toolbar is displayed. Used when compactHeader is true. Default: true', examples: [true] }))),
+            layout: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Layout tab is displayed. Available for document and spreadsheet editors. Default: true', examples: [true], default: true }))),
+            plugins: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Plugins tab is displayed. Default: true', examples: [true], default: true }))),
+            protect: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Protection tab is displayed. Default: true', examples: [true], default: true }))),
+            references: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the References tab is displayed. Available for document editor only. Default: true', examples: [true], default: true }))),
+            save: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Save button on the toolbar is displayed. Used when compactHeader is true. Default: true', examples: [true], default: true }))),
             view: v.optional(LayoutToolbarViewSchema),
         }),
     ]),
@@ -264,13 +264,13 @@ const LayoutSchema = v.pipe(
 
 const ReviewModeSchema = v.pipe(
     v.object({
-        hideReviewDisplay: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Display mode button is displayed on the Collaboration tab. Default: false', examples: [false] }))),
-        hoverMode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the review display mode: tooltips (true) or balloons (false). Default: false', examples: [false] }))),
+        hideReviewDisplay: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Display mode button is displayed on the Collaboration tab. Default: false', examples: [false], default: false }))),
+        hoverMode: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the review display mode: tooltips (true) or balloons (false). Default: false', examples: [false], default: false }))),
         reviewDisplay: v.optional(v.pipe(
             v.picklist(['markup', 'simple', 'final', 'original'] as const),
-            v.metadata({ description: 'Defines the review display mode. Default: original', examples: ['original'] }),
+            v.metadata({ description: 'Defines the review display mode. Default: original', examples: ['original'], default: 'original' }),
         )),
-        showReviewChanges: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the review changes panel is automatically displayed. Default: false', examples: [false] }))),
+        showReviewChanges: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the review changes panel is automatically displayed. Default: false', examples: [false], default: false }))),
         trackChanges: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document is opened in the review editing mode. Default: depends on document.permissions.review', examples: [true] }))),
     }),
     v.metadata({ description: 'Contains the information about the review mode' }),
@@ -280,7 +280,7 @@ const SubmitFormSchema = v.pipe(
     v.union([
         v.boolean(),
         v.object({
-            visible: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Complete & Submit button will be displayed. Default: true', examples: [true] }))),
+            visible: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Complete & Submit button will be displayed. Default: true', examples: [true], default: true }))),
             resultMessage: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines a message displayed after forms are submitted', examples: ['text'] }))),
         }),
     ]),
@@ -335,20 +335,20 @@ const CustomizationSchema = v.pipe(
         )),
         features: v.optional(FeaturesSchema),
         feedback: v.optional(FeedbackSchema),
-        forcesave: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Adds the request for force saving when saving the document. Default: false', examples: [false] }))),
-        forceWesternFontSize: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if Western (true) or Chinese (false) font size is used in Chinese UI. Default: false', examples: [false] }))),
+        forcesave: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Adds the request for force saving when saving the document. Default: false', examples: [false], default: false }))),
+        forceWesternFontSize: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if Western (true) or Chinese (false) font size is used in Chinese UI. Default: false', examples: [false], default: false }))),
         goback: v.optional(v.pipe(
             v.object({
-                blank: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Opens the website in a new browser tab (true) or current tab (false). Default: true', examples: [true] }))),
+                blank: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Opens the website in a new browser tab (true) or current tab (false). Default: true', examples: [true], default: true }))),
                 requestClose: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Calls events.onRequestClose instead of opening a browser tab. Deprecated since 8.1.', examples: [false] }))),
                 text: v.optional(v.pipe(v.string(), v.metadata({ description: 'The text for the Open file location button', examples: ['Open file location'] }))),
                 url: v.optional(v.pipe(v.string(), v.metadata({ description: 'The absolute URL to open when clicking the button', examples: ['https://example.com'] }))),
             }),
             v.metadata({ description: 'Defines settings for the Open file location menu button' }),
         )),
-        help: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Help menu button is displayed or hidden. Default: true', examples: [true] }))),
-        hideNotes: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the note panel is displayed or hidden on first loading. Available for presentation editor only. Default: false', examples: [false] }))),
-        hideRightMenu: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the right menu is displayed or hidden on first loading. Default: true', examples: [true] }))),
+        help: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the Help menu button is displayed or hidden. Default: true', examples: [true], default: true }))),
+        hideNotes: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the note panel is displayed or hidden on first loading. Available for presentation editor only. Default: false', examples: [false], default: false }))),
+        hideRightMenu: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the right menu is displayed or hidden on first loading. Default: true', examples: [true], default: true }))),
         hideRulers: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the editor rulers are displayed or hidden. Default: false for documents, true for presentations', examples: [false] }))),
         integrationMode: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the mode of embedding editors into the web page', examples: ['embed'] }))),
         logo: v.optional(v.pipe(
@@ -358,55 +358,55 @@ const CustomizationSchema = v.pipe(
                 imageLight: v.optional(v.pipe(v.string(), v.metadata({ description: 'Path to the image file for light header (300x20)', examples: ['https://example.com/light-logo.png'] }))),
                 imageEmbedded: v.optional(v.pipe(v.string(), v.metadata({ description: 'Path to the image file for embedded mode (248x40). Deprecated since 7.0.', examples: ['https://example.com/logo_em.png'] }))),
                 url: v.optional(v.pipe(v.string(), v.metadata({ description: 'The absolute URL which will be used when someone clicks the logo image', examples: ['https://example.com'] }))),
-                visible: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Shows or hides the logo. Default: true', examples: [true] }))),
+                visible: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Shows or hides the logo. Default: true', examples: [true], default: true }))),
             }),
             v.metadata({ description: 'Changes the image file at the top left corner of the editor header. Recommended height: 20 pixels.' }),
         )),
-        macros: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if document macros will be automatically run when the editor opens. Default: true', examples: [true] }))),
+        macros: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if document macros will be automatically run when the editor opens. Default: true', examples: [true], default: true }))),
         macrosMode: v.optional(v.pipe(
             v.picklist(['disable', 'warn', 'enable'] as const),
-            v.metadata({ description: 'Defines the macros run mode when autostart is enabled. Default: warn', examples: ['warn'] }),
+            v.metadata({ description: 'Defines the macros run mode when autostart is enabled. Default: warn', examples: ['warn'], default: 'warn' }),
         )),
-        mentionShare: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the hint that describes the event after mentions in a comment. Default: true', examples: [true] }))),
+        mentionShare: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines the hint that describes the event after mentions in a comment. Default: true', examples: [true], default: true }))),
         mobile: v.optional(v.pipe(
             v.object({
-                forceView: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the view mode is enabled on launch. Default: true', examples: [true] }))),
-                info: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Document Info button is displayed. Default: false', examples: [false] }))),
-                standardView: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the editor will be opened in Standard view. Default: false', examples: [false] }))),
+                forceView: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the view mode is enabled on launch. Default: true', examples: [true], default: true }))),
+                info: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Document Info button is displayed. Default: false', examples: [false], default: false }))),
+                standardView: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the editor will be opened in Standard view. Default: false', examples: [false], default: false }))),
             }),
             v.metadata({ description: 'Defines the mobile document editor settings' }),
         )),
         mobileForceView: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the mobile document editor is opened in view/edit mode on launch. Deprecated since 8.2, use mobile parameter instead.', examples: [true] }))),
-        plugins: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if plugins will be launched and available. Default: true', examples: [true] }))),
+        plugins: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if plugins will be launched and available. Default: true', examples: [true], default: true }))),
         pointerMode: v.optional(v.pipe(
             v.picklist(['select', 'hand'] as const),
-            v.metadata({ description: 'Defines the pointer mode when the presentation editor is loaded in the viewer. Default: select', examples: ['select'] }),
+            v.metadata({ description: 'Defines the pointer mode when the presentation editor is loaded in the viewer. Default: select', examples: ['select'], default: 'select' }),
         )),
         review: v.optional(ReviewModeSchema),
         reviewDisplay: v.optional(v.pipe(
             v.picklist(['markup', 'simple', 'final', 'original'] as const),
             v.metadata({ description: 'Defines the review editing mode in the document editor. Deprecated since 7.0, use review.reviewDisplay instead.', examples: ['original'] }),
         )),
-        showHorizontalScroll: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the horizontal scroll is automatically displayed when the spreadsheet editor is loaded. Available since 8.3. Default: true', examples: [true] }))),
+        showHorizontalScroll: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the horizontal scroll is automatically displayed when the spreadsheet editor is loaded. Available since 8.3. Default: true', examples: [true], default: true }))),
         showReviewChanges: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the review changes panel is automatically displayed. Deprecated since 7.0, use review.showReviewChanges instead.', examples: [false] }))),
-        showVerticalScroll: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the vertical scroll is automatically displayed when the spreadsheet editor is loaded. Available since 8.3. Default: true', examples: [true] }))),
+        showVerticalScroll: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the vertical scroll is automatically displayed when the spreadsheet editor is loaded. Available since 8.3. Default: true', examples: [true], default: true }))),
         slidePlayerBackground: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the background color for the slide show in the presentation editor. Can be HEX, RGB, or RGBA. Available since 8.3.', examples: ['#000000'] }))),
         spellcheck: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the spell checker is automatically switched on or off. Deprecated since 7.1, use features.spellcheck instead.', examples: [true] }))),
         submitForm: v.optional(SubmitFormSchema),
-        suggestFeature: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Suggest a Feature menu button will be displayed. Default: true', examples: [true] }))),
-        toolbarHideFileName: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document title is visible on the top toolbar. Default: false', examples: [false] }))),
+        suggestFeature: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines whether the Suggest a Feature menu button will be displayed. Default: true', examples: [true], default: true }))),
+        toolbarHideFileName: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document title is visible on the top toolbar. Default: false', examples: [false], default: false }))),
         toolbarNoTabs: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the top toolbar tabs are distinctly displayed (false) or only highlighted (true). Deprecated since 8.2.', examples: [false] }))),
         trackChanges: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the document is opened in the review editing mode. Deprecated since 7.0, use review.trackChanges instead.', examples: [true] }))),
         uiTheme: v.optional(v.pipe(
             v.picklist(['theme-light', 'theme-classic-light', 'theme-dark', 'theme-contrast-dark', 'theme-white', 'theme-night', 'default-dark', 'default-light'] as const),
-            v.metadata({ description: 'Defines the editor theme settings. Default: theme-classic-light', examples: ['theme-dark'] }),
+            v.metadata({ description: 'Defines the editor theme settings. Default: theme-classic-light', examples: ['theme-dark'], default: 'theme-classic-light' }),
         )),
         unit: v.optional(v.pipe(
             v.picklist(['cm', 'pt', 'inch'] as const),
-            v.metadata({ description: 'Defines the measurement units used on the ruler. Default: cm', examples: ['cm'] }),
+            v.metadata({ description: 'Defines the measurement units used on the ruler. Default: cm', examples: ['cm'], default: 'cm' }),
         )),
         wordHeadingsColor: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the HEX color for the default heading styles in the document editor. Available since 8.3.', examples: ['#00ff00'] }))),
-        zoom: v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.metadata({ description: 'Defines the document display zoom value in percent. Can be -1 (fit to page) or -2 (fit width). Default: 100', examples: [100] }))),
+        zoom: v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.metadata({ description: 'Defines the document display zoom value in percent. Can be -1 (fit to page) or -2 (fit width). Default: 100', examples: [100], default: 100 }))),
         layout: v.optional(LayoutSchema),
         leftMenu: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the left menu panel is displayed or hidden. Deprecated since 7.1, use layout.leftMenu instead.', examples: [true] }))),
         loaderLogo: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the path to the image logo which will be displayed while the document is being loaded', examples: ['https://example.com/loader-logo.png'] }))),
@@ -440,21 +440,21 @@ const EditorConfigSchema = v.pipe(
             v.object({
                 mode: v.optional(v.pipe(
                     v.picklist(['fast', 'strict'] as const),
-                    v.metadata({ description: 'The co-editing mode. Default: fast', examples: ['fast'] }),
+                    v.metadata({ description: 'The co-editing mode. Default: fast', examples: ['fast'], default: 'fast' }),
                 )),
-                change: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the co-editing mode can be changed in the editor interface. Default: true', examples: [true] }))),
+                change: v.optional(v.pipe(v.boolean(), v.metadata({ description: 'Defines if the co-editing mode can be changed in the editor interface. Default: true', examples: [true], default: true }))),
             }),
             v.metadata({ description: 'Defines the co-editing mode (Fast or Strict) and the possibility to change it' }),
         )),
         createUrl: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the absolute URL of the document where it will be created and available after creation', examples: ['https://example.com/url-to-create-document/'] }))),
-        lang: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the editor interface language using two-letter language codes (de, ru, it, etc.). For Portuguese (Portugal) or Chinese (Traditional, Taiwan) use pt-PT or zh-TW. Default: en', examples: ['en'] }))),
+        lang: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the editor interface language using two-letter language codes (de, ru, it, etc.). For Portuguese (Portugal) or Chinese (Traditional, Taiwan) use pt-PT or zh-TW. Default: en', examples: ['en'], default: 'en' }))),
         location: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the default measurement units. Specify us or ca for inches. Deprecated since 8.2, use region parameter instead.', examples: [''] }))),
         mode: v.optional(v.pipe(
             v.picklist(['view', 'edit'] as const),
-            v.metadata({ description: 'Defines the editor opening mode. Default: edit', examples: ['edit'] }),
+            v.metadata({ description: 'Defines the editor opening mode. Default: edit', examples: ['edit'], default: 'edit' }),
         )),
         recent: v.optional(v.pipe(v.array(RecentItemSchema), v.metadata({ description: 'Defines the presence or absence of the documents in the Open Recent menu option' }))),
-        region: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the default display format for currency and date/time using four letter codes (en-US, fr-FR, etc.). Default: en-US', examples: ['en-US'] }))),
+        region: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the default display format for currency and date/time using four letter codes (en-US, fr-FR, etc.). Default: en-US', examples: ['en-US'], default: 'en-US' }))),
         templates: v.optional(v.pipe(v.array(TemplateItemSchema), v.metadata({ description: 'Defines the presence or absence of the templates in the Create New menu option' }))),
         user: v.optional(EditorUserSchema),
         customization: v.optional(CustomizationSchema),
@@ -535,12 +535,12 @@ export const EditorConfigRootSchema = v.object({
         v.picklist(['word', 'cell', 'slide', 'pdf', 'diagram'] as const),
         v.metadata({ description: 'Defines the document type to be opened', examples: ['cell'] }),
     )),
-    height: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the document height (100% by default) in the browser window', examples: ['100%', '550px'] }))),
-    width: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the document width (100% by default) in the browser window', examples: ['100%'] }))),
+    height: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the document height (100% by default) in the browser window', examples: ['100%', '550px'], default: '100%' }))),
+    width: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the document width (100% by default) in the browser window', examples: ['100%'], default: '100%' }))),
     token: v.optional(v.pipe(v.string(), v.metadata({ description: 'Defines the encrypted signature added to the ONLYOFFICE Docs config in the form of a token', examples: ['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.LwimMJA3puF3ioGeS-tfczR3370GXBZMIL-bdpu4hOU'] }))),
     type: v.optional(v.pipe(
         v.picklist(['desktop', 'mobile', 'embedded'] as const),
-        v.metadata({ description: 'Defines the platform type used to access the document. Default: desktop', examples: ['desktop'] }),
+        v.metadata({ description: 'Defines the platform type used to access the document. Default: desktop', examples: ['desktop'], default: 'desktop' }),
     )),
     document: v.optional(DocumentSchema),
     editorConfig: v.optional(EditorConfigSchema),

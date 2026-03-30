@@ -12,8 +12,7 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc",
-    "generate:types": "bun scripts/generate-editor-types.ts"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@docsearch/core": "^4.6.0",
