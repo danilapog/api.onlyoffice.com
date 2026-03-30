@@ -15,9 +15,11 @@ export interface SchemaNode {
     enum?: unknown[]
     anyOf?: SchemaNode[]
     properties?: Record<string, SchemaNode>
+    items?: SchemaNode
     description?: string
     examples?: unknown[]
     default?: unknown
+    hidden?: boolean
 }
 
 export interface ConfigNode {
@@ -28,6 +30,8 @@ export interface ConfigNode {
     schemaNode?: SchemaNode
     children?: ConfigNode[]
     depth: number
+    /** true when the value was derived from the schema (default/example/fallback), not from an actual config */
+    fromSchema?: boolean
 }
 
 export interface ConfigEditorState {
@@ -53,7 +57,7 @@ export type ConfigEditorAction =
 
 type AnyValibotSchema = Record<string, any>
 
-function getValibotMetadata(schema: AnyValibotSchema): { description?: string; examples?: unknown[]; default?: unknown } | undefined {
+function getValibotMetadata(schema: AnyValibotSchema): { description?: string; examples?: unknown[]; default?: unknown; hidden?: boolean } | undefined {
     if (!Array.isArray(schema.pipe)) return undefined
     for (const item of schema.pipe as AnyValibotSchema[]) {
         if (item?.kind === 'metadata' && item.metadata != null) return item.metadata
@@ -68,6 +72,7 @@ function extractSchemaFromValibot(raw: AnyValibotSchema): SchemaNode {
     if (meta?.description) node.description = meta.description
     if (meta?.examples) node.examples = meta.examples
     if (meta?.default !== undefined) node.default = meta.default
+    if (meta?.hidden) node.hidden = true
 
     switch (schema.type) {
         case 'object':
@@ -94,6 +99,7 @@ function extractSchemaFromValibot(raw: AnyValibotSchema): SchemaNode {
             break
         case 'array':
             node.type = 'array'
+            if (schema.item) node.items = extractSchemaFromValibot(schema.item)
             break
         case 'union':
             node.anyOf = (schema.options ?? []).map(extractSchemaFromValibot)
@@ -148,6 +154,10 @@ function getSchemaDefaultValue(rawSchema: SchemaNode): unknown {
     if (rawSchema.default !== undefined) return rawSchema.default
     if (rawSchema.examples !== undefined && rawSchema.examples.length > 0)
         return rawSchema.examples[0]
+    // Type-based fallbacks so every leaf in the schema tree is editable
+    if (rawSchema.type === 'string') return ''
+    if (rawSchema.type === 'number') return 0
+    if (rawSchema.type === 'boolean') return false
     return undefined
 }
 
@@ -176,6 +186,9 @@ function buildNodes(
 
         let val: unknown
         const inConfig = Object.prototype.hasOwnProperty.call(config, key)
+
+        // Skip schema-declared hidden fields unless they are explicitly in the imported config
+        if (rawSchema?.hidden && !inConfig) continue
 
         if (inConfig) {
             val = config[key]
@@ -206,6 +219,7 @@ function buildNodes(
             type,
             schemaNode: resolvedSchema,
             depth,
+            fromSchema: !inConfig,
         }
 
         if (type === 'object' && typeof val === 'object' && val !== null && !Array.isArray(val)) {
@@ -216,6 +230,26 @@ function buildNodes(
                 depth + 1,
                 useSchemaDefaults,
             )
+            // Skip schema-derived objects whose sub-fields have no displayable defaults —
+            // they produce an empty tree and would render as "[object Object]"
+            if (!inConfig && node.children.length === 0) continue
+        }
+
+        if (type === 'array' && Array.isArray(val)) {
+            const itemSchema = resolvedSchema?.items
+            node.children = (val as unknown[]).map((item, i) => {
+                const childId = `${id}.${i}`
+                const childType = inferType(item, itemSchema)
+                return {
+                    id: childId,
+                    key: String(i),
+                    value: item,
+                    type: childType,
+                    schemaNode: itemSchema,
+                    depth: depth + 1,
+                    fromSchema: !inConfig,
+                } satisfies ConfigNode
+            })
         }
 
         nodes.push(node)
@@ -223,18 +257,54 @@ function buildNodes(
     return nodes
 }
 
+/**
+ * Collect IDs of nodes that were derived from the schema (not from the actual config).
+ * When a defaultConfig is provided, only fields explicitly in that config stay active;
+ * everything else is pre-commented so it doesn't pollute the generated JSON.
+ */
+function collectSchemaIds(nodes: ConfigNode[]): Set<string> {
+    const ids = new Set<string>()
+    for (const node of nodes) {
+        if (node.type === 'array') {
+            // If the array itself is schema-derived, comment it out wholesale;
+            // don't recurse into its items (they follow the parent's fate via ancestor check)
+            if (node.fromSchema) ids.add(node.id)
+            continue
+        }
+        if (node.children) {
+            for (const id of collectSchemaIds(node.children)) ids.add(id)
+        } else if (node.fromSchema) {
+            ids.add(node.id)
+        }
+    }
+    return ids
+}
+
 export function buildInitialState(
     config: Record<string, unknown> = {},
     useSchemaDefaults = true,
 ): ConfigEditorState {
+    const nodes = buildNodes(config, SCHEMA_TREE, '', 0, useSchemaDefaults)
     return {
-        nodes: buildNodes(config, SCHEMA_TREE, '', 0, useSchemaDefaults),
-        commentedIds: new Set(),
+        nodes,
+        commentedIds: collectSchemaIds(nodes),
         collapsedIds: new Set(),
         validationErrors: new Map(),
         defaultConfig: config,
         useSchemaDefaults,
     }
+}
+
+function buildNodeValue(node: ConfigNode, commentedIds: Set<string>): unknown {
+    if (node.type === 'object' && node.children) {
+        return buildConfig(node.children, commentedIds)
+    }
+    if (node.type === 'array' && node.children) {
+        return node.children
+            .filter((child) => !commentedIds.has(child.id))
+            .map((child) => buildNodeValue(child, commentedIds))
+    }
+    return node.value
 }
 
 export function buildConfig(
@@ -244,11 +314,7 @@ export function buildConfig(
     const result: Record<string, unknown> = {}
     for (const node of nodes) {
         if (commentedIds.has(node.id)) continue
-        if (node.type === 'object' && node.children) {
-            result[node.key] = buildConfig(node.children, commentedIds)
-        } else {
-            result[node.key] = node.value
-        }
+        result[node.key] = buildNodeValue(node, commentedIds)
     }
     return result
 }

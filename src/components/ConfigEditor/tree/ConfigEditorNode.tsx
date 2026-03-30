@@ -16,14 +16,24 @@ function isAncestorCommented(id: string, commentedIds: Set<string>): boolean {
     return false
 }
 
+function isNodeEffectivelyCommented(node: ConfigNode, commentedIds: Set<string>): boolean {
+    if (commentedIds.has(node.id)) return true
+    if (node.children && node.children.length > 0) {
+        return node.children.every((child) => isNodeEffectivelyCommented(child, commentedIds))
+    }
+    return false
+}
+
 export function ConfigEditorNode({ node }: Props) {
     const { dispatch, commentedIds, collapsedIds, validationErrors } = useConfigEditorContext()
 
     const isCommented = commentedIds.has(node.id)
-    const isDimmed = isCommented || isAncestorCommented(node.id, commentedIds)
+    const isDimmed = isNodeEffectivelyCommented(node, commentedIds) || isAncestorCommented(node.id, commentedIds)
     const isCollapsed = collapsedIds.has(node.id)
     const error = validationErrors.get(node.id)
-    const hasChildren = node.type === 'object' && (node.children?.length ?? 0) > 0
+    const isArray = node.type === 'array'
+    const hasChildren = (node.type === 'object' || isArray) && (node.children?.length ?? 0) > 0
+    const displayKey = /^\d+$/.test(node.key) ? `[${node.key}]` : node.key
 
     const handleToggleComment = useCallback(() => {
         dispatch({ type: 'TOGGLE_COMMENT', id: node.id })
@@ -45,21 +55,26 @@ export function ConfigEditorNode({ node }: Props) {
             className={[
                 styles.row,
                 isDimmed ? styles.commented : '',
+                isArray ? styles.arrayRow : '',
                 error ? styles.hasError : '',
             ]
                 .filter(Boolean)
                 .join(' ')}
             style={{ '--depth': node.depth } as React.CSSProperties}
         >
-            {/* Left gutter — comment toggle */}
-            <button
-                className={styles.gutter}
-                onClick={handleToggleComment}
-                title={isCommented ? 'Uncomment this field' : 'Comment out this field'}
-                aria-label={isCommented ? 'Uncomment' : 'Comment out'}
-            >
-                <span className={styles.gutterDot} />
-            </button>
+            {/* Left gutter — comment toggle; replaced with spacer when dimmed only because all children are commented */}
+            {isDimmed && !isCommented ? (
+                <span className={styles.gutter} aria-hidden />
+            ) : (
+                <button
+                    className={styles.gutter}
+                    onClick={handleToggleComment}
+                    title={isCommented ? 'Uncomment this field' : 'Comment out this field'}
+                    aria-label={isCommented ? 'Uncomment' : 'Comment out'}
+                >
+                    <span className={styles.gutterDot} />
+                </button>
+            )}
 
             {/* Indentation + collapse triangle */}
             <div className={styles.indent}>
@@ -85,21 +100,21 @@ export function ConfigEditorNode({ node }: Props) {
                     .join(' ')}
                 title={node.schemaNode?.description}
             >
-                {node.key}
+                {displayKey}
             </span>
 
             <span className={styles.colon}>:</span>
 
-            {/* Value area — shown when not dimmed and not an expandable object */}
-            {!isDimmed && !hasChildren && (
+            {/* Value area — always shown for leaf nodes; dimming comes from CSS on the row */}
+            {!hasChildren && (
                 <div className={styles.valueArea}>
                     <ValueControl node={node} onChange={handleValueChange} />
                 </div>
             )}
 
-            {/* Object summary when collapsed */}
+            {/* Collapsed summary: […] for arrays, {…} for objects */}
             {hasChildren && isCollapsed && (
-                <span className={styles.objectSummary}>{'{…}'}</span>
+                <span className={styles.objectSummary}>{isArray ? '[…]' : '{…}'}</span>
             )}
 
             {/* Error indicator */}
@@ -148,10 +163,6 @@ function ValueControl({ node, onChange }: ValueControlProps) {
 
     if (node.type === 'string') {
         return <TextControl value={String(node.value ?? '')} onChange={onChange} />
-    }
-
-    if (node.type === 'array') {
-        return <span className={styles.unknownValue}>{JSON.stringify(node.value)}</span>
     }
 
     return <span className={styles.unknownValue}>{String(node.value)}</span>

@@ -1,11 +1,12 @@
 import Head from '@docusaurus/Head'
-import { ColorModeProvider } from '@docusaurus/theme-common/internal'
+import { ColorModeProvider, useColorMode } from '@docusaurus/theme-common/internal'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { EditorPreview, EditorPreviewRef } from '@site/src/components/EditorPreview'
 import { SplitPane } from '@site/src/components/SplitPane'
 import { ConfigEditor } from '@site/src/components/ConfigEditor'
 import styles from './config-editor.module.css'
+import type { EditorConfig } from '@site/src/components/ConfigEditor/editor-config.gen'
 
 const withFreshKey = (config: Record<string, any>): Record<string, any> => ({
     ...config,
@@ -22,7 +23,30 @@ const ConfigEditorInner = () => {
 
     const documentServerUrl = customFields.documentServer as string
     const documentServerSecret = customFields.documentServerSecret as string
+    const { colorMode } = useColorMode()
     const editorRef = useRef<EditorPreviewRef>(null)
+
+    const defaultConfig = useMemo<EditorConfig>(() => ({
+        documentType: 'word',
+        type: 'desktop',
+        width: '100%',
+        height: '100%',
+        document: {
+            fileType: 'docx',
+            key: 'demo-document-key',
+            title: 'Example Document Title.docx',
+            url: 'https://static.onlyoffice.com/assets/docs/samples/demo.docx',
+        },
+        editorConfig: {
+            callbackUrl: documentServerUrl + 'dummyCallback',
+            user: { id: 'userID', name: 'Developer' },
+            customization: {
+                uiTheme: colorMode === 'dark' ? 'default-dark' : 'default-light',
+                features: { featuresTips: false },
+            },
+            lang: 'en',
+        },
+    }), [documentServerUrl, colorMode])
 
     const handleApply = (config: Record<string, unknown>) => {
         editorRef.current?.initEditor(withFreshKey(config))
@@ -30,7 +54,7 @@ const ConfigEditorInner = () => {
 
     return (
         <div className={styles.container}>
-            <ConfigEditor.Root onApply={handleApply}>
+            <ConfigEditor.Root defaultConfig={defaultConfig as Record<string, unknown>} onApply={handleApply}>
                 <ConfigEditor.Toolbar />
                 <SplitPane
                     first={<ConfigEditor.Tree />}

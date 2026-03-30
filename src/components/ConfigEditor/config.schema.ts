@@ -527,7 +527,7 @@ const EventsSchema = v.pipe(
         onUserActionRequired: v.optional(v.pipe(v.string(), v.metadata({ description: 'The function called when a user action is required to open a document (password, encoding selection, etc.)' }))),
         onWarning: v.optional(v.pipe(v.string(), v.metadata({ description: 'The function called when a warning occurs' }))),
     }),
-    v.metadata({ description: 'Defines event handlers for document editor' }),
+    v.metadata({ description: 'Defines event handlers for document editor', hidden: true }),
 )
 
 export const EditorConfigRootSchema = v.object({

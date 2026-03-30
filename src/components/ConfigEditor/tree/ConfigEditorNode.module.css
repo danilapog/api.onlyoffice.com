@@ -266,6 +266,17 @@ html[data-theme='dark'] .selectTrigger {
     background-color: var(--ifm-dropdown-hover-background-color);
 }
 
+/* ---- Array row marker ---- */
+
+.arrayRow .key::after {
+    content: '[ ]';
+    margin-left: 4px;
+    font-size: 10px;
+    font-style: normal;
+    opacity: 0.45;
+    letter-spacing: -0.5px;
+}
+
 /* ---- Object summary ---- */
 
 .objectSummary {
