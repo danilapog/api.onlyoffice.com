@@ -6,7 +6,6 @@ import { EditorPreview, EditorPreviewRef } from '@site/src/components/EditorPrev
 import { SplitPane } from '@site/src/components/SplitPane'
 import { ConfigEditor } from '@site/src/components/ConfigEditor'
 import styles from './config-editor.module.css'
-import type { EditorConfig } from '@site/src/components/ConfigEditor/editor-config.gen'
 
 const withFreshKey = (config: Record<string, any>): Record<string, any> => ({
     ...config,
@@ -26,7 +25,7 @@ const ConfigEditorInner = () => {
     const { colorMode } = useColorMode()
     const editorRef = useRef<EditorPreviewRef>(null)
 
-    const defaultConfig = useMemo<EditorConfig>(() => ({
+    const defaultConfig = useMemo<Record<string, unknown>>(() => ({
         documentType: 'word',
         type: 'desktop',
         width: '100%',
@@ -54,19 +53,21 @@ const ConfigEditorInner = () => {
 
     return (
         <div className={styles.container}>
-            <ConfigEditor.Root defaultConfig={defaultConfig as Record<string, unknown>} onApply={handleApply}>
-                <ConfigEditor.Toolbar />
-                <SplitPane
-                    first={<ConfigEditor.Tree />}
-                    second={
-                        <EditorPreview
-                            ref={editorRef}
-                            documentServerUrl={documentServerUrl}
-                            documentServerSecret={documentServerSecret}
-                        />
-                    }
-                />
-            </ConfigEditor.Root>
+            <SplitPane
+                first={
+                    <ConfigEditor
+                        defaultConfig={defaultConfig}
+                        onApply={handleApply}
+                    />
+                }
+                second={
+                    <EditorPreview
+                        ref={editorRef}
+                        documentServerUrl={documentServerUrl}
+                        documentServerSecret={documentServerSecret}
+                    />
+                }
+            />
         </div>
     )
 }

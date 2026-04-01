@@ -1,0 +1,244 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--ifm-background-color);
+}
+
+/* ── Toolbar ─────────────────────────────────────── */
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-background-surface-color);
+    flex-shrink: 0;
+}
+
+.toolbarButton {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.4;
+}
+
+.toolbarButton:hover {
+    background: var(--ifm-hover-overlay);
+    border-color: var(--ifm-color-primary);
+}
+
+.toolbarButtonPrimary {
+    background: var(--ifm-color-primary);
+    border-color: var(--ifm-color-primary);
+    color: #fff;
+}
+
+.toolbarButtonPrimary:hover {
+    background: var(--ifm-color-primary-dark);
+    border-color: var(--ifm-color-primary-dark);
+    color: #fff;
+}
+
+/* ── Form wrapper (scrollable) ───────────────────── */
+
+.formWrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* ── RJSF form reset & base ──────────────────────── */
+
+.form {
+    font-family: var(--ifm-font-family-base);
+    font-size: 14px;
+    color: var(--ifm-font-color-base);
+}
+
+.hiddenField {
+    display: none;
+}
+
+/* ── Field wrapper ───────────────────────────────── */
+
+.field {
+    margin-bottom: 12px;
+}
+
+/* ── Label row with tooltip ──────────────────────── */
+
+.fieldLabelRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ifm-font-color-base);
+    cursor: default;
+}
+
+.required {
+    color: var(--ifm-color-danger);
+}
+
+/* ── Tooltip ─────────────────────────────────────── */
+
+.tooltipIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ifm-color-secondary-darkest);
+    font-size: 9px;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--ifm-color-secondary-darkest);
+    cursor: help;
+    user-select: none;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.tooltipContent {
+    width: 240px;
+    background: var(--ifm-tooltip-background-color, #333);
+    color: var(--ifm-tooltip-color, #fff);
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 6px;
+    padding: 7px 10px;
+    line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    white-space: normal;
+    animation-duration: 150ms;
+    will-change: transform, opacity;
+}
+
+.tooltipArrow {
+    fill: var(--ifm-tooltip-background-color, #333);
+}
+
+
+/* ── Inputs & selects ────────────────────────────── */
+
+.form input[type='text'],
+.form input[type='number'],
+.form input[type='url'],
+.form input[type='email'],
+.form textarea,
+.form select {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 6px;
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    font-family: var(--ifm-font-family-base);
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus {
+    outline: none;
+    border-color: var(--ifm-color-primary);
+}
+
+/* ── Checkbox ────────────────────────────────────── */
+
+.form input[type='checkbox'] {
+    accent-color: var(--ifm-color-primary);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Checkbox label row rendered by RJSF widget */
+.form span > input[type='checkbox'] {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* ── Nested object fieldsets ─────────────────────── */
+
+.form fieldset {
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.form legend {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ifm-color-primary);
+    padding: 0 4px;
+    text-transform: capitalize;
+}
+
+/* ── Errors ──────────────────────────────────────── */
+
+.form .error-detail {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.form .error-detail li {
+    font-size: 12px;
+    color: var(--ifm-color-danger);
+}
+
+.form .field-error-schema input,
+.form .field-error-schema select,
+.form .field-error-schema textarea {
+    border-color: var(--ifm-color-danger);
+}
+
+/* ── Array items ─────────────────────────────────── */
+
+.form .array-item {
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.form .array-item-toolbox button,
+.form .btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    cursor: pointer;
+    font-family: var(--ifm-font-family-base);
+}
+
+.form .btn-add {
+    margin-top: 8px;
+    border-color: var(--ifm-color-primary);
+    color: var(--ifm-color-primary);
+}
+
+.form .btn-danger {
+    border-color: var(--ifm-color-danger);
+    color: var(--ifm-color-danger);
+}
