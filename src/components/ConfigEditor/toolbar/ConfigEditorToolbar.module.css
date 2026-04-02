@@ -18,3 +18,33 @@
     gap: 8px;
     margin-left: auto;
 }
+
+.toolbarButton {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.4;
+}
+
+.toolbarButton:hover {
+    background: var(--ifm-hover-overlay);
+    border-color: var(--ifm-color-primary);
+}
+
+.toolbarButtonPrimary {
+    background: var(--ifm-color-primary);
+    border-color: var(--ifm-color-primary);
+    color: #fff;
+}
+
+.toolbarButtonPrimary:hover {
+    background: var(--ifm-color-primary-dark);
+    border-color: var(--ifm-color-primary-dark);
+    color: #fff;
+}

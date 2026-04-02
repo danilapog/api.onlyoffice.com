@@ -249,6 +249,8 @@ html[data-theme='dark'] .selectTrigger {
 .selectViewport {
     padding: 4px;
     min-width: 120px;
+    max-height: 240px;
+    overflow-y: auto;
 }
 
 .selectItem {

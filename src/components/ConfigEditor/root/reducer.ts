@@ -314,7 +314,10 @@ export function buildConfig(
     const result: Record<string, unknown> = {}
     for (const node of nodes) {
         if (commentedIds.has(node.id)) continue
-        result[node.key] = buildNodeValue(node, commentedIds)
+        const value = buildNodeValue(node, commentedIds)
+        if (node.type === 'object' && typeof value === 'object' && value !== null && Object.keys(value as object).length === 0) continue
+        if (node.type === 'array' && Array.isArray(value) && value.length === 0) continue
+        result[node.key] = value
     }
     return result
 }

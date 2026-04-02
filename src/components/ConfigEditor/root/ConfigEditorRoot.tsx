@@ -72,7 +72,11 @@ export function ConfigEditorRoot({
         [state, handleApply, handleCopy, handleImport],
     )
 
-    return <ConfigEditorRootContext.Provider value={contextValue} {...props} />
+    return (
+        <ConfigEditorRootContext.Provider value={contextValue}>
+            <div {...props} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', ...props.style }} />
+        </ConfigEditorRootContext.Provider>
+    )
 }
 
 export namespace ConfigEditorRoot {
