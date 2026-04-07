@@ -32,11 +32,16 @@ function DescriptionFieldTemplate(_props: DescriptionFieldProps) {
     return null
 }
 
-const DefaultSelectWidget = getDefaultRegistry().widgets.SelectWidget
+const { SelectWidget: DefaultSelectWidget, TextWidget: DefaultTextWidget } = getDefaultRegistry().widgets
 
 function SelectWidget(props: WidgetProps) {
     const patched = { ...props.schema, default: props.schema.default ?? props.schema.enum?.[0] }
     return <DefaultSelectWidget {...props} schema={patched} />
+}
+
+function TextWidget(props: WidgetProps) {
+    const { examples: _examples, ...schema } = props.schema as Record<string, unknown> & { examples?: unknown }
+    return <DefaultTextWidget {...props} schema={schema} />
 }
 
 function FieldTemplate({ id, label, required, hidden, children, errors, schema: fieldSchema, displayLabel }: FieldTemplateProps) {
@@ -189,7 +194,7 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
                     liveValidate={false}
                     experimental_defaultFormStateBehavior={defaultFormStateBehavior}
                     templates={{ FieldTemplate, DescriptionFieldTemplate, ObjectFieldTemplate }}
-                    widgets={{ SelectWidget }}
+                    widgets={{ SelectWidget, TextWidget }}
                     className={styles.form}
                 />
             </div>
