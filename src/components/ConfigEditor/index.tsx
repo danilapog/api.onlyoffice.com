@@ -1,5 +1,5 @@
 import Form, { getDefaultRegistry } from '@rjsf/core'
-import { DescriptionFieldProps, FieldTemplateProps, ObjectFieldTemplateProps, RJSFSchema, UiSchema, WidgetProps, getDefaultFormState } from '@rjsf/utils'
+import { ArrayFieldItemTemplateProps, ArrayFieldTemplateProps, DescriptionFieldProps, FieldTemplateProps, MultiSchemaFieldTemplateProps, ObjectFieldTemplateProps, RJSFSchema, UiSchema, WidgetProps, getDefaultFormState } from '@rjsf/utils'
 import validator from '@rjsf/validator-ajv8'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import schema from '@site/static/schemas/config.json'
@@ -49,6 +49,7 @@ function FieldTemplate({ id, label, required, hidden, children, errors, schema: 
 
     const description = fieldSchema.description as string | undefined
     const isCheckbox = fieldSchema.type === 'boolean'
+    const isInArrayItem = id?.includes('_') && /^\d+$/.test(id.split('_').pop() || '')
 
     if (isCheckbox) {
         return (
@@ -68,20 +69,56 @@ function FieldTemplate({ id, label, required, hidden, children, errors, schema: 
         )
     }
 
-    return (
-        <div className={styles.field}>
-            {displayLabel && label && (
-                <label htmlFor={id} className={styles.fieldLabelRow}>
-                    <span>
-                        {label}
-                        {required && <span className={styles.required}> *</span>}
-                    </span>
-                    {description && <InfoTooltip text={description} />}
-                </label>
-            )}
+    const labelContent = displayLabel && label && (
+        <span>
+            {label}
+            {required && <span className={styles.required}> *</span>}
+        </span>
+    )
+
+    const input = (
+        <div className={isInArrayItem ? styles.fieldArrayInput : undefined}>
             {children}
             {errors}
         </div>
+    )
+
+    if (isInArrayItem) {
+        return (
+            <>
+                {labelContent && (
+                    <label htmlFor={id} className={styles.fieldLabelArray}>
+                        {labelContent}
+                        {description && <InfoTooltip text={description} />}
+                    </label>
+                )}
+                {input}
+            </>
+        )
+    }
+
+    return (
+        <div className={styles.field}>
+            {labelContent && (
+                <label htmlFor={id} className={styles.fieldLabelRow}>
+                    {labelContent}
+                    {description && <InfoTooltip text={description} />}
+                </label>
+            )}
+            {input}
+            {errors}
+        </div>
+    )
+}
+
+function Chevron({ open }: { open: boolean }) {
+    return (
+        <svg
+            className={open ? `${styles.chevron} ${styles.chevronOpen}` : styles.chevron}
+            width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
     )
 }
 
@@ -94,15 +131,11 @@ function ObjectFieldTemplate({ title, properties, fieldPathId, schema: fieldSche
     }
 
     const description = fieldSchema.description as string | undefined
-    const detailsClass = styles.details
-    const chevronClass = open ? `${styles.chevron} ${styles.chevronOpen}` : styles.chevron
 
     return (
-        <details className={detailsClass} onToggle={(e) => setOpen(e.currentTarget.open)}>
+        <details className={styles.details} onToggle={(e) => setOpen(e.currentTarget.open)}>
             <summary className={styles.summary}>
-                <svg className={chevronClass} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <Chevron open={open} />
                 {title}
                 {description && <InfoTooltip text={description} />}
             </summary>
@@ -110,6 +143,65 @@ function ObjectFieldTemplate({ title, properties, fieldPathId, schema: fieldSche
                 {properties.map(p => p.content)}
             </div>
         </details>
+    )
+}
+
+function ArrayFieldTemplate({ title, items, canAdd, onAddClick, disabled, readonly, schema: fieldSchema }: ArrayFieldTemplateProps) {
+    const [open, setOpen] = useState(false)
+    const description = fieldSchema.description as string | undefined
+
+    return (
+        <details className={styles.details} onToggle={(e) => setOpen(e.currentTarget.open)}>
+            <summary className={styles.summary}>
+                <Chevron open={open} />
+                {title}
+                {description && <InfoTooltip text={description} />}
+            </summary>
+            <div className={styles.detailsContent}>
+                {items}
+                {canAdd && (
+                    <button
+                        className={`${styles.toolbarButton} ${styles.arrayAddButton}`}
+                        onClick={onAddClick}
+                        disabled={disabled || readonly}
+                        type="button"
+                    >
+                        + Add item
+                    </button>
+                )}
+            </div>
+        </details>
+    )
+}
+
+function ArrayFieldItemTemplate({ children, buttonsProps }: ArrayFieldItemTemplateProps) {
+    const { hasRemove, disabled, readonly, onRemoveItem } = buttonsProps
+
+    return (
+        <div className={styles.arrayItem}>
+            {children}
+            {hasRemove && (
+                <div className={styles.fieldArrayInputWithButton}>
+                    <button
+                        className={styles.arrayRemoveButton}
+                        onClick={onRemoveItem}
+                        disabled={disabled || readonly}
+                        type="button"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function MultiSchemaFieldTemplate({ selector, optionSchemaField }: MultiSchemaFieldTemplateProps) {
+    return (
+        <div className={styles.multiSchema}>
+            {selector}
+            {optionSchemaField}
+        </div>
     )
 }
 
@@ -193,7 +285,7 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
                     onSubmit={({ formData: data }) => onApply(data ?? {})}
                     liveValidate={false}
                     experimental_defaultFormStateBehavior={defaultFormStateBehavior}
-                    templates={{ FieldTemplate, DescriptionFieldTemplate, ObjectFieldTemplate }}
+                    templates={{ FieldTemplate, DescriptionFieldTemplate, ObjectFieldTemplate, ArrayFieldTemplate, ArrayFieldItemTemplate, MultiSchemaFieldTemplate }}
                     widgets={{ SelectWidget, TextWidget }}
                     className={styles.form}
                 />

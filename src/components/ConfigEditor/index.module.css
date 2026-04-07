@@ -74,6 +74,30 @@
     margin-bottom: 12px;
 }
 
+.fieldArrayInput {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.fieldArrayInputWithButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.fieldLabelArray {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    grid-column: 1 / -1;
+    grid-row: 1;
+}
+
 /* ── Label row with tooltip ──────────────────────── */
 
 .fieldLabelRow {
@@ -181,6 +205,10 @@
     gap: 8px;
 }
 
+.fieldCheckbox .fieldLabelRow {
+    margin-bottom: 0;
+}
+
 .form input[type='checkbox'] {
     accent-color: var(--ifm-color-primary);
     width: 15px;
@@ -264,34 +292,44 @@
     border-color: var(--ifm-color-danger);
 }
 
-/* ── Array items ─────────────────────────────────── */
+/* ── Array & MultiSchema ─────────────────────────── */
 
-.form .array-item {
-    border: 1px solid var(--ifm-toc-border-color);
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 10px;
+.arrayItem {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: start;
 }
 
-.form .array-item-toolbox button,
-.form .btn {
-    padding: 4px 10px;
-    font-size: 12px;
+.arrayItemContent {
+    display: contents;
+}
+
+.arrayRemoveButton {
+    padding: 6px 10px;
+    font-size: 16px;
+    line-height: 1;
     border-radius: 5px;
     border: 1px solid var(--ifm-toc-border-color);
     background: var(--ifm-background-color);
-    color: var(--ifm-font-color-base);
-    cursor: pointer;
-    font-family: var(--ifm-font-family-base);
-}
-
-.form .btn-add {
-    margin-top: 8px;
-    border-color: var(--ifm-color-primary);
-    color: var(--ifm-color-primary);
-}
-
-.form .btn-danger {
-    border-color: var(--ifm-color-danger);
     color: var(--ifm-color-danger);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.arrayRemoveButton:hover {
+    border-color: var(--ifm-color-danger);
+}
+
+.arrayAddButton {
+    margin-top: 4px;
+    font-size: 12px;
+    padding: 4px 10px;
+}
+
+.multiSchema {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
