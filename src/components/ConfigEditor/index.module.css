@@ -149,6 +149,20 @@
     transition: border-color 0.15s;
     box-sizing: border-box;
     font-family: var(--ifm-font-family-base);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.form input::-webkit-list-button,
+.form input::-webkit-calendar-picker-indicator {
+    display: none;
 }
 
 .form input:focus,
@@ -160,6 +174,13 @@
 
 /* ── Checkbox ────────────────────────────────────── */
 
+.fieldCheckbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
 .form input[type='checkbox'] {
     accent-color: var(--ifm-color-primary);
     width: 15px;
@@ -168,30 +189,61 @@
     flex-shrink: 0;
 }
 
+.form :global(.checkbox) {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
 /* Hide RJSF checkbox widget's built-in label (shown via FieldTemplate instead) */
 .form :global(.checkbox) label span {
     display: none;
 }
 
-/* ── Nested object fieldsets ─────────────────────── */
+/* ── Nested object sections (details/summary accordion) ── */
 
-.form fieldset {
+.details {
     border: 1px solid var(--ifm-toc-border-color);
     border-radius: 8px;
-    padding: 16px 18px;
-    margin-bottom: 20px;
-    margin-top: 0;
+    margin-bottom: 12px;
     min-width: 0;
-    overflow: hidden;
 }
 
-.form legend {
+
+.summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
     font-weight: 600;
     font-size: 13px;
     color: var(--ifm-color-primary);
-    padding: 0 4px;
     text-transform: capitalize;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
 }
+
+.summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.chevron {
+    flex-shrink: 0;
+    color: var(--ifm-color-primary);
+    transform: rotate(-90deg);
+    transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+    transform: rotate(0deg);
+}
+
+.detailsContent {
+    padding: 0 14px 14px;
+}
+
 
 /* ── Errors ──────────────────────────────────────── */
 
