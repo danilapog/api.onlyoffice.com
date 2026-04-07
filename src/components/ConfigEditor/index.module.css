@@ -168,10 +168,9 @@
     flex-shrink: 0;
 }
 
-/* Checkbox label row rendered by RJSF widget */
-.form span > input[type='checkbox'] {
-    margin-right: 6px;
-    vertical-align: middle;
+/* Hide RJSF checkbox widget's built-in label (shown via FieldTemplate instead) */
+.form :global(.checkbox) label span {
+    display: none;
 }
 
 /* ── Nested object fieldsets ─────────────────────── */
@@ -182,6 +181,8 @@
     padding: 16px 18px;
     margin-bottom: 20px;
     margin-top: 0;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .form legend {

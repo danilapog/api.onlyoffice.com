@@ -1,5 +1,5 @@
-import Form from '@rjsf/core'
-import { FieldTemplateProps, RJSFSchema, UiSchema } from '@rjsf/utils'
+import Form, { getDefaultRegistry } from '@rjsf/core'
+import { DescriptionFieldProps, FieldTemplateProps, RJSFSchema, UiSchema, WidgetProps } from '@rjsf/utils'
 import validator from '@rjsf/validator-ajv8'
 import { useEffect, useRef, useState } from 'react'
 import schema from '@site/static/schemas/config.json'
@@ -22,14 +22,27 @@ function InfoTooltip({ text }: { text: string }) {
     )
 }
 
+function DescriptionFieldTemplate(_props: DescriptionFieldProps) {
+    return null
+}
+
+const DefaultSelectWidget = getDefaultRegistry().widgets.SelectWidget
+
+function SelectWidget(props: WidgetProps) {
+    const patched = { ...props.schema, default: props.schema.default ?? props.schema.enum?.[0] }
+    return <DefaultSelectWidget {...props} schema={patched} />
+}
+
 function FieldTemplate({ id, label, required, hidden, children, errors, schema: fieldSchema, displayLabel }: FieldTemplateProps) {
     if (hidden) return <div className={styles.hiddenField}>{children}</div>
 
     const description = fieldSchema.description as string | undefined
+    const isCheckbox = fieldSchema.type === 'boolean'
+    const shouldShowLabel = (displayLabel && label) || isCheckbox
 
     return (
         <div className={styles.field}>
-            {displayLabel && label && (
+            {shouldShowLabel && label && (
                 <label htmlFor={id} className={styles.fieldLabelRow}>
                     <span>
                         {label}
@@ -111,7 +124,8 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
                     onChange={({ formData: data }) => setFormData(data ?? {})}
                     onSubmit={({ formData: data }) => onApply(data ?? {})}
                     liveValidate={false}
-                    templates={{ FieldTemplate }}
+                    templates={{ FieldTemplate, DescriptionFieldTemplate }}
+                    widgets={{ SelectWidget }}
                     className={styles.form}
                 />
             </div>
