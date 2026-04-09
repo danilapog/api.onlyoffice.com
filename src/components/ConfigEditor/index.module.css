@@ -56,7 +56,7 @@
     padding: 20px;
 }
 
-/* ── RJSF form reset & base ──────────────────────── */
+/* ── Form base ───────────────────────────────────── */
 
 .form {
     font-family: var(--ifm-font-family-base);
@@ -184,11 +184,6 @@
     padding-right: 30px;
 }
 
-.form input::-webkit-list-button,
-.form input::-webkit-calendar-picker-indicator {
-    display: none;
-}
-
 .form input:focus,
 .form textarea:focus,
 .form select:focus {
@@ -215,17 +210,6 @@
     height: 15px;
     cursor: pointer;
     flex-shrink: 0;
-}
-
-.form :global(.checkbox) {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
-
-/* Hide RJSF checkbox widget's built-in label (shown via FieldTemplate instead) */
-.form :global(.checkbox) label span {
-    display: none;
 }
 
 /* ── Nested object sections (details/summary accordion) ── */
@@ -272,25 +256,6 @@
     padding: 0 14px 14px;
 }
 
-
-/* ── Errors ──────────────────────────────────────── */
-
-.form .error-detail {
-    margin: 4px 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.form .error-detail li {
-    font-size: 12px;
-    color: var(--ifm-color-danger);
-}
-
-.form .field-error-schema input,
-.form .field-error-schema select,
-.form .field-error-schema textarea {
-    border-color: var(--ifm-color-danger);
-}
 
 /* ── Array & MultiSchema ─────────────────────────── */
 
