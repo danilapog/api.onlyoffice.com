@@ -563,38 +563,38 @@ Add a script to initialize the [Manager](/docspace/javascript-sdk/usage-sdk/clas
 
 1. Initialize the **Manager** to create new files:
 
-    ``` ts
-    manager = DocSpace.SDK.initManager({
-      frameId: "ds-manager-frame",
-      width: "0",
-      height: "0",
-      events: {
-        onAppReady: () => {
-          managerReady = true
-        },
-      },
-    })
-    ```
+``` ts
+manager = DocSpace.SDK.initManager({
+  frameId: "ds-manager-frame",
+  width: "0",
+  height: "0",
+  events: {
+    onAppReady: () => {
+      managerReady = true
+    },
+  },
+})
+```
 
 2. Initialize the **file selector** and save the template file ID and its folder:
 
-    ``` ts
-    selector = DocSpace.SDK.initFileSelector({
-      frameId: "ds-template-selector",
-      width: "900px",
-      height: "520px",
-      events: {
-        onSelectCallback: (e) => {
-          const item = Array.isArray(e) ? e[0] : e
-          template = {
-            id: String(item?.id ?? item?.fileId ?? ""),
-            ext: String(item?.extension || item?.ext || ""),
-            folderId: String(item?.folderId || item?.parentId || ""),
-          }
-        },
-      },
-    })
-    ```
+``` ts
+selector = DocSpace.SDK.initFileSelector({
+  frameId: "ds-template-selector",
+  width: "900px",
+  height: "520px",
+  events: {
+    onSelectCallback: (e) => {
+      const item = Array.isArray(e) ? e[0] : e
+      template = {
+        id: String(item?.id ?? item?.fileId ?? ""),
+        ext: String(item?.extension || item?.ext || ""),
+        folderId: String(item?.folderId || item?.parentId || ""),
+      }
+    },
+  },
+})
+```
 
 ### 3. Create output files
 
@@ -607,12 +607,21 @@ const createdId = res?.id ?? res?.fileId
 
 ### 4. Fill the PDF via executeInEditor
 
-Open each created file in the editor and fill PDF fields by **FormKey**:
+Open each created file in the editor and fill PDF form fields by **FormKey** using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method:
 
 ``` ts
-await fillFile(createdId, toFillMap(person), 6500)
+editorInstance = DocSpace.SDK.initEditor({
+  frameId: "ds-editor-frame",
+  fileId: String(createdId),
+  events: {
+    onAppReady: () => {
+      const frame = DocSpace.SDK.frames["ds-editor-frame"]
+      frame.executeInEditor(buildPdfFillCommand(map))
+    },
+  },
+})
 ```
 
 ### 5. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
