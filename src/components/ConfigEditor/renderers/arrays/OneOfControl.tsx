@@ -6,9 +6,18 @@ import styles from '../../index.module.css'
 
 function getOptionLabel(schema: JsonSchema, index: number): string {
     if (schema.title) return schema.title
-    if (schema.type === 'array') return 'Array'
+    if (schema.description) return truncate(schema.description, 80)
+    if (schema.type === 'array') {
+        const itemType = (schema.items as JsonSchema | undefined)?.type
+        return itemType ? `List of ${itemType}s` : 'List'
+    }
     if (schema.type) return String(schema.type)
     return `Option ${index + 1}`
+}
+
+function truncate(text: string, max: number): string {
+    if (text.length <= max) return text
+    return `${text.slice(0, max - 1).trimEnd()}…`
 }
 
 function OneOfControlRenderer({

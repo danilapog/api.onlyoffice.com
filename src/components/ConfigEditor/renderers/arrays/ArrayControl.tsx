@@ -64,7 +64,7 @@ function ArrayControlRenderer({
                     const childPath = composePaths(path, `${index}`)
                     return (
                         <div key={index} className={styles.arrayItem}>
-                            <div className={styles.arrayItemContent}>
+                            <div className={styles.arrayItemFields}>
                                 {isObjectItems ? (
                                     Object.keys(schema.properties!).map((key) => {
                                         const propPath = composePaths(childPath, key)
@@ -89,16 +89,15 @@ function ArrayControlRenderer({
                                 )}
                             </div>
                             {removeItems && (
-                                <div className={styles.fieldArrayInputWithButton}>
-                                    <button
-                                        className={styles.arrayRemoveButton}
-                                        onClick={removeItems(path, [index])}
-                                        disabled={!enabled}
-                                        type="button"
-                                    >
-                                        &times;
-                                    </button>
-                                </div>
+                                <button
+                                    className={styles.arrayRemoveButton}
+                                    onClick={removeItems(path, [index])}
+                                    disabled={!enabled}
+                                    type="button"
+                                    aria-label="Remove item"
+                                >
+                                    &times;
+                                </button>
                             )}
                         </div>
                     )

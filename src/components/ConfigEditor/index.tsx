@@ -21,9 +21,15 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
     const [formData, setFormData] = useState<Record<string, unknown>>(initialFormData)
     const [copyLabel, setCopyLabel] = useState('Copy')
 
+    // Re-sync local form state and re-init the preview whenever the merged
+    // defaults change (e.g. after `useColorMode()` hydrates from undefined to
+    // 'light'/'dark'). `onApply` is intentionally not in the deps — including
+    // it would re-fire on every parent render.
     useEffect(() => {
+        setFormData(initialFormData)
         onApply(initialFormData)
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialFormData])
 
     const handleImport = async () => {
         try {

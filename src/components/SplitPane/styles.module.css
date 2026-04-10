@@ -69,8 +69,8 @@
 }
 
 .TabsRoot {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
     flex: 1;
     overflow: hidden;
 }
@@ -79,16 +79,24 @@
     display: flex;
     border-bottom: 1px solid var(--ifm-color-emphasis-300);
     background: var(--ifm-background-surface-color);
-    flex-shrink: 0;
+    grid-row: 1;
 }
 
+/* Both panels share the same grid cell so each one keeps full dimensions
+   while inactive — required so the OnlyOffice editor iframe initializes
+   with non-zero width/height even when the Preview tab is not active. */
 .TabPanel {
-    flex: 1;
+    grid-row: 2;
+    grid-column: 1;
+    min-height: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .TabPanel[hidden] {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .Tab {

@@ -260,15 +260,18 @@
 /* ── Array & MultiSchema ─────────────────────────── */
 
 .arrayItem {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    align-items: flex-start;
     gap: 8px;
     margin-bottom: 8px;
-    align-items: start;
 }
 
-.arrayItemContent {
-    display: contents;
+.arrayItemFields {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .arrayRemoveButton {
@@ -281,6 +284,7 @@
     color: var(--ifm-color-danger);
     cursor: pointer;
     flex-shrink: 0;
+    align-self: flex-start;
 }
 
 .arrayRemoveButton:hover {

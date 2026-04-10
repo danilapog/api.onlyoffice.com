@@ -268,6 +268,7 @@
                     },
                     {
                       "type": "string",
+                      "description": "Empty string means user can remove comments from any group",
                       "examples": [
                         ""
                       ]

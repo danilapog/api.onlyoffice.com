@@ -46,10 +46,10 @@ export const SplitPane = ({
                         {secondLabel}
                     </Tabs.Trigger>
                 </Tabs.List>
-                <Tabs.Content value="first" className={styles.TabPanel}>
+                <Tabs.Content value="first" className={styles.TabPanel} forceMount>
                     {first}
                 </Tabs.Content>
-                <Tabs.Content value="second" className={styles.TabPanel}>
+                <Tabs.Content value="second" className={styles.TabPanel} forceMount>
                     {second}
                 </Tabs.Content>
             </Tabs.Root>
