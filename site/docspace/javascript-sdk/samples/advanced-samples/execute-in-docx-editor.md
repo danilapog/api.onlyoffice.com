@@ -1,3 +1,8 @@
+---
+description: Open a DOCX file in an editor frame, run an automation command using executeInEditor, and save the document.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Execute in DOCX editor
 
 This example opens a **.docx** file in an editor frame, runs an automation command using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method, and then saves and closes the editor.
@@ -485,31 +490,31 @@ Add a script to initialize the [file selector](/docspace/javascript-sdk/usage-sd
 
 1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback). When the user selects a file, save its ID:
 
-    ``` ts
-    let selected = null
+``` ts
+let selected = null
 
-    function onSelectCallback(e) {
-      const item = Array.isArray(e) ? e[0] : e
-      if (!item) return
-      selected = { id: String(item?.id ?? item?.fileId ?? "") }
-    }
-    ```
+function onSelectCallback(e) {
+  const item = Array.isArray(e) ? e[0] : e
+  if (!item) return
+  selected = { id: String(item?.id ?? item?.fileId ?? "") }
+}
+```
 
 2. Create a configuration for the file selector:
 
-    ``` ts
-    const config = {
-      frameId: "ds-selector",
-      width: "900px",
-      height: "520px",
-      theme: "base",
-      events: {
-        onSelectCallback,
-      },
-    }
-    
-    const selectorInstance = DocSpace.SDK.initFileSelector(config)
-    ```
+``` ts
+const config = {
+  frameId: "ds-selector",
+  width: "900px",
+  height: "520px",
+  theme: "base",
+  events: {
+    onSelectCallback,
+  },
+}
+
+const selectorInstance = DocSpace.SDK.initFileSelector(config)
+```
 
 ### 3. Initialize an editor
 
@@ -612,7 +617,7 @@ setTimeout(() => {
 
 ### 6. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
 
 :::note
 This sample uses the text document editor API. For best results, pick a **.docx** file.
