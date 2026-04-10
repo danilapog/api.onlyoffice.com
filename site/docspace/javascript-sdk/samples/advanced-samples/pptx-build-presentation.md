@@ -5,7 +5,7 @@ tags: ["DocSpace", "Embed SDK", "Integration"]
 
 # Build PPTX presentation
 
-This example creates a new PPTX file and generates a 3‑slide deck using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
+This example creates a new PPTX file and generates a 3-slide deck using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
 
 Complete source code on GitHub: [JavaScript](https://github.com/ONLYOFFICE/docspace-samples/blob/master/js-sdk/advanced-samples/pptx-build-presentation.html)
 
