@@ -1,3 +1,8 @@
+---
+description: Fill a PDF template for a list of people and create one PDF per person in the same folder.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Batch fill from PDF template
 
 This example fills a PDF template for a list of people and creates one PDF per person in the same folder using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
