@@ -1,3 +1,8 @@
+---
+description: Create a new PPTX file and generate a 3-slide deck using the executeInEditor method.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Build PPTX presentation
 
 This example creates a new PPTX file and generates a 3‑slide deck using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
@@ -409,29 +414,29 @@ Add a script to initialize the [Manager](/docspace/javascript-sdk/usage-sdk/clas
 
 1. Initialize the hidden **Manager** (for file creation):
 
-    ``` ts
-    manager = DocSpace.SDK.initManager({
-      frameId: "ds-manager-frame",
-      width: "0",
-      height: "0",
-      events: {
-        onAppReady: () => {
-          managerReady = true
-        },
-      },
-    })
-    ```
+``` ts
+manager = DocSpace.SDK.initManager({
+  frameId: "ds-manager-frame",
+  width: "0",
+  height: "0",
+  events: {
+    onAppReady: () => {
+      managerReady = true
+    },
+  },
+})
+```
 
 2. Initialize the destination picker:
 
-    ``` ts
-    picker = DocSpace.SDK.initManager({
-      frameId: "ds-destination-picker",
-      width: "900px",
-      height: "520px",
-      selectorType: "folder",
-    })
-    ```
+``` ts
+picker = DocSpace.SDK.initManager({
+  frameId: "ds-destination-picker",
+  width: "900px",
+  height: "520px",
+  selectorType: "folder",
+})
+```
 
 ### 3. Create a PPTX file
 
@@ -447,10 +452,19 @@ const createdId = res?.id ?? res?.fileId
 Open the created file in the editor and build slides using [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor):
 
 ``` ts
-await buildDeck(createdId)
+editorInstance = DocSpace.SDK.initEditor({
+  frameId: "ds-editor-frame",
+  id: String(createdId),
+  events: {
+    onAppReady: () => {
+      const frame = DocSpace.SDK.frames["ds-editor-frame"]
+      frame.executeInEditor(buildDeckCommand())
+    },
+  },
+})
 ```
 
 ### 5. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
 
