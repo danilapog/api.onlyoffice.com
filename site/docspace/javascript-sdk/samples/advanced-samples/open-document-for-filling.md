@@ -1,3 +1,8 @@
+---
+description: Open a document in fill mode using a generated DocSpace link or via the SDK editor.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Open document for filling
 
 This example opens a document in fill mode (`action=fill`) using a generated DocSpace link or via the SDK editor.
@@ -261,32 +266,32 @@ Add a script to initialize the [file selector](/docspace/javascript-sdk/usage-sd
 
 1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback). When the user selects a file, save its ID and build the fill URL with `action=fill`:
 
-    ``` ts
-    let selected = null
+``` ts
+let selected = null
 
-    function onSelectCallback(e) {
-      const item = Array.isArray(e) ? e[0] : e
-      if (!item) return
-      const id = item?.id ?? item?.fileId ?? null
-      selected = { id: id ? String(id) : "", title: String(item?.title || "") }
-    }
-    ```
+function onSelectCallback(e) {
+  const item = Array.isArray(e) ? e[0] : e
+  if (!item) return
+  const id = item?.id ?? item?.fileId ?? null
+  selected = { id: id ? String(id) : "", title: String(item?.title || "") }
+}
+```
 
 2. Create a configuration for the file selector and initialize it with the [initFileSelector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector) method:
 
-    ``` ts
-    const config = {
-      frameId: "ds-frame",
-      width: "900px",
-      height: "520px",
-      theme: "base",
-      events: {
-        onSelectCallback,
-      },
-    }
+``` ts
+const config = {
+  frameId: "ds-frame",
+  width: "900px",
+  height: "520px",
+  theme: "base",
+  events: {
+    onSelectCallback,
+  },
+}
 
-    const selectorInstance = DocSpace.SDK.initFileSelector(config)
-    ```
+const selectorInstance = DocSpace.SDK.initFileSelector(config)
+```
 
 ### 3. Open document in fill mode
 
@@ -312,4 +317,4 @@ DocSpace.SDK.initEditor({
 
 ### 5. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
