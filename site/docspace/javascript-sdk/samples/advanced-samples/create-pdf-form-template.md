@@ -1,3 +1,8 @@
+---
+description: Create a new fillable PDF and insert form fields using the JavaScript SDK.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Create PDF form template
 
 This example creates a new fillable PDF and inserts form fields (FormKey) using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
