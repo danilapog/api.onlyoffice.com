@@ -1,3 +1,8 @@
+---
+description: Fill PDF form fields by their FormKey values using the executeInEditor method, then save the result.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Fill PDF form by key
 
 This example fills PDF form fields by their **FormKey** values using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method, then saves the result.
@@ -501,33 +506,33 @@ Add a script to initialize the [file selector](/docspace/javascript-sdk/usage-sd
 
 1. Add an event handler for [onSelectCallback](/docspace/javascript-sdk/usage-sdk/type-aliases/TFrameEvents.md#onselectcallback). When the user selects a file, save its ID and extension:
 
-    ``` ts
-    let selected = null
+``` ts
+let selected = null
 
-    function onSelectCallback(e) {
-      const item = Array.isArray(e) ? e[0] : e
-      if (!item) return
-      const id = item?.id ?? item?.fileId ?? null
-      const ext = item?.fileExst || item?.extension || item?.ext || ""
-      selected = { id: id ? String(id) : "", ext: String(ext) }
-    }
-    ```
+function onSelectCallback(e) {
+  const item = Array.isArray(e) ? e[0] : e
+  if (!item) return
+  const id = item?.id ?? item?.fileId ?? null
+  const ext = item?.fileExst || item?.extension || item?.ext || ""
+  selected = { id: id ? String(id) : "", ext: String(ext) }
+}
+```
 
 2. Create a configuration for the file selector and initialize it with the [initFileSelector](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initfileselector) method:
 
-    ``` ts
-    const config = {
-      frameId: "ds-selector",
-      width: "900px",
-      height: "520px",
-      theme: "base",
-      events: {
-        onSelectCallback,
-      },
-    }
+``` ts
+const config = {
+  frameId: "ds-selector",
+  width: "900px",
+  height: "520px",
+  theme: "base",
+  events: {
+    onSelectCallback,
+  },
+}
 
-    const selectorInstance = DocSpace.SDK.initFileSelector(config)
-    ```
+const selectorInstance = DocSpace.SDK.initFileSelector(config)
+```
 
 ### 3. Prepare the fill map
 
@@ -552,4 +557,4 @@ await withHiddenEditor("Filling & saving", (frame) => {
 
 ### 5. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
