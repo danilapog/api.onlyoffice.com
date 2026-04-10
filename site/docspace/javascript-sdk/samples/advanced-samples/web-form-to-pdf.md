@@ -1,3 +1,8 @@
+---
+description: Fill a website questionnaire and generate a filled PDF from a DocSpace PDF template.
+tags: ["DocSpace", "Embed SDK", "Integration"]
+---
+
 # Web form to PDF
 
 This example fills a website questionnaire and generates a filled PDF from a DocSpace PDF template using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method.
@@ -820,40 +825,40 @@ The API JavaScript file can normally be found in the following DocSpace folder: 
 
 Add a script to initialize the [Manager](/docspace/javascript-sdk/usage-sdk/classes/SDK.md#initmanager), the template selector, and the destination picker.
 
-1. Initialize the hidden **Manager**:
+Initialize the hidden **Manager**:
 
-    ``` ts
-    manager = DocSpace.SDK.initManager({
-      frameId: "ds-manager-frame",
-      width: "0",
-      height: "0",
-      events: {
-        onAppReady: () => {
-          managerReady = true
-        },
-      },
-    })
-    ```
+``` ts
+manager = DocSpace.SDK.initManager({
+  frameId: "ds-manager-frame",
+  width: "0",
+  height: "0",
+  events: {
+    onAppReady: () => {
+      managerReady = true
+    },
+  },
+})
+```
 
-2. Initialize the template selector in a modal:
+Initialize the template selector in a modal:
 
-    ``` ts
-    selector = DocSpace.SDK.initFileSelector({
-      frameId: "ds-template-selector",
-      width: "900px",
-      height: "520px",
-      events: {
-        onSelectCallback: (e) => {
-          const item = Array.isArray(e) ? e[0] : e
-          template = {
-            id: String(item?.id ?? item?.fileId ?? ""),
-            ext: String(item?.extension || item?.ext || ""),
-            folderId: String(item?.folderId || item?.parentId || ""),
-          }
-        },
-      },
-    })
-    ```
+``` ts
+selector = DocSpace.SDK.initFileSelector({
+  frameId: "ds-template-selector",
+  width: "900px",
+  height: "520px",
+  events: {
+    onSelectCallback: (e) => {
+      const item = Array.isArray(e) ? e[0] : e
+      template = {
+        id: String(item?.id ?? item?.fileId ?? ""),
+        ext: String(item?.extension || item?.ext || ""),
+        folderId: String(item?.folderId || item?.parentId || ""),
+      }
+    },
+  },
+})
+```
 
 ### 3. Create a PDF from template
 
@@ -866,12 +871,21 @@ const createdId = res?.id ?? res?.fileId
 
 ### 4. Fill fields via executeInEditor
 
-Open the created PDF in the editor and fill fields by **FormKey**:
+Open the created PDF in the editor and fill PDF form fields by **FormKey** using the [executeInEditor](/docspace/javascript-sdk/usage-sdk/classes/SDKInstance.md#executeineditor) method:
 
 ``` ts
-await fillFile(createdId, map, 6500)
+editorInstance = DocSpace.SDK.initEditor({
+  id: String(createdId),
+  frameId: "ds-editor-frame",
+  events: {
+    onAppReady: () => {
+      const frame = DocSpace.SDK.frames["ds-editor-frame"]
+      frame.executeInEditor(buildPdfFillCommand(map))
+    },
+  },
+})
 ```
 
 ### 5. Run the sample
 
-Run the HTML file and make sure everything works.
+Run our HTML file and make sure everything works.
