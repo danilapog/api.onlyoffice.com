@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ControlProps, isObjectControl, rankWith } from '@jsonforms/core'
+import { ControlProps, isObjectControl, JsonSchema, rankWith } from '@jsonforms/core'
 import { JsonFormsDispatch, withJsonFormsControlProps } from '@jsonforms/react'
 import { Chevron } from '../../utils/Chevron'
 import { InfoTooltip } from '../../utils/InfoTooltip'
@@ -15,14 +15,13 @@ function ObjectLayoutRenderer({ schema, path, visible, renderers, cells, uischem
 
     const childElements = propertyKeys.map((key) => {
         const childPath = path ? `${path}.${key}` : key
-        const childScope = uischema.scope
-            ? `${uischema.scope}/properties/${key}`
-            : `#/properties/${key}`
+        const childSchema = properties[key] as JsonSchema
 
         return (
             <JsonFormsDispatch
                 key={key}
-                uischema={{ type: 'Control', scope: childScope }}
+                schema={childSchema}
+                uischema={{ type: 'Control', scope: '#' }}
                 path={childPath}
                 renderers={renderers}
                 cells={cells}
