@@ -402,7 +402,8 @@
               "examples": [
                 true
               ],
-              "title": "Review"
+              "title": "Review",
+              "default": true
             },
             "reviewGroups": {
               "type": "array",
@@ -613,7 +614,8 @@
           "examples": [
             ""
           ],
-          "title": "Location"
+          "title": "Location",
+          "default": ""
         },
         "mode": {
           "type": "string",
@@ -770,7 +772,8 @@
               "examples": [
                 true
               ],
-              "title": "About"
+              "title": "About",
+              "default": true
             },
             "anonymous": {
               "type": "object",
@@ -782,7 +785,8 @@
                   "examples": [
                     true
                   ],
-                  "title": "Request"
+                  "title": "Request",
+                  "default": true
                 },
                 "label": {
                   "type": "string",
@@ -790,7 +794,8 @@
                   "examples": [
                     "Guest"
                   ],
-                  "title": "Label"
+                  "title": "Label",
+                  "default": "Guest"
                 }
               },
               "title": "Anonymous"
@@ -801,7 +806,8 @@
               "examples": [
                 true
               ],
-              "title": "Autosave"
+              "title": "Autosave",
+              "default": true
             },
             "close": {
               "type": "object",
@@ -812,7 +818,8 @@
                   "examples": [
                     true
                   ],
-                  "title": "Visible"
+                  "title": "Visible",
+                  "default": true
                 },
                 "text": {
                   "type": "string",
@@ -830,7 +837,8 @@
               "examples": [
                 true
               ],
-              "title": "Comments"
+              "title": "Comments",
+              "default": true
             },
             "compactHeader": {
               "type": "boolean",
@@ -838,7 +846,8 @@
               "examples": [
                 false
               ],
-              "title": "Compact Header"
+              "title": "Compact Header",
+              "default": false
             },
             "compactToolbar": {
               "type": "boolean",
@@ -846,7 +855,8 @@
               "examples": [
                 false
               ],
-              "title": "Compact Toolbar"
+              "title": "Compact Toolbar",
+              "default": false
             },
             "compatibleFeatures": {
               "type": "boolean",
@@ -854,7 +864,8 @@
               "examples": [
                 false
               ],
-              "title": "Compatible Features"
+              "title": "Compatible Features",
+              "default": false
             },
             "customer": {
               "type": "object",
@@ -1303,7 +1314,8 @@
               "examples": [
                 true
               ],
-              "title": "Mobile Force View"
+              "title": "Mobile Force View",
+              "default": true
             },
             "plugins": {
               "type": "boolean",
@@ -1396,7 +1408,8 @@
               "examples": [
                 "original"
               ],
-              "title": "Review Display"
+              "title": "Review Display",
+              "default": "original"
             },
             "showHorizontalScroll": {
               "type": "boolean",
@@ -1413,7 +1426,8 @@
               "examples": [
                 false
               ],
-              "title": "Show Review Changes"
+              "title": "Show Review Changes",
+              "default": false
             },
             "showVerticalScroll": {
               "type": "boolean",
@@ -1438,7 +1452,8 @@
               "examples": [
                 true
               ],
-              "title": "Spell Check"
+              "title": "Spell Check",
+              "default": true
             },
             "submitForm": {
               "oneOf": [
@@ -1495,7 +1510,8 @@
               "examples": [
                 false
               ],
-              "title": "Toolbar No Tabs"
+              "title": "Toolbar No Tabs",
+              "default": false
             },
             "trackChanges": {
               "type": "boolean",

@@ -24,6 +24,7 @@ const ConfigEditorInner = () => {
     const documentServerSecret = customFields.documentServerSecret as string
     const { colorMode } = useColorMode()
     const editorRef = useRef<EditorPreviewRef>(null)
+    const latestConfigRef = useRef<Record<string, any> | null>(null)
 
     const defaultConfig = useMemo<Record<string, unknown>>(() => ({
         documentType: 'word',
@@ -48,7 +49,15 @@ const ConfigEditorInner = () => {
     }), [documentServerUrl, colorMode])
 
     const handleApply = (config: Record<string, unknown>) => {
-        editorRef.current?.initEditor(withFreshKey(config))
+        const c = withFreshKey(config)
+        latestConfigRef.current = c
+        editorRef.current?.initEditor(c)
+    }
+
+    const handlePreviewReady = () => {
+        if (latestConfigRef.current) {
+            editorRef.current?.initEditor(latestConfigRef.current)
+        }
     }
 
     return (
@@ -65,6 +74,7 @@ const ConfigEditorInner = () => {
                         ref={editorRef}
                         documentServerUrl={documentServerUrl}
                         documentServerSecret={documentServerSecret}
+                        onReady={handlePreviewReady}
                     />
                 }
             />

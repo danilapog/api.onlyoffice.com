@@ -15,18 +15,21 @@ export interface EditorPreviewRef {
 interface EditorPreviewProps {
     documentServerUrl: string
     documentServerSecret?: string
+    onReady?: () => void
     ref?: Ref<EditorPreviewRef>
 }
 
 export const EditorPreview = ({
                                   documentServerUrl,
                                   documentServerSecret,
+                                  onReady,
                                   ref,
                               }: EditorPreviewProps) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const isApiLoadedRef = useRef(false)
     const initializingRef = useRef(false)
-    const pendingConfigRef = useRef<Record<string, any> | null>(null)
+    const onReadyRef = useRef(onReady)
+    onReadyRef.current = onReady
 
     const createJWT = useCallback(
         async (payload: object): Promise<string> => {
@@ -74,10 +77,7 @@ export const EditorPreview = ({
 
     const initEditor = useCallback(
         async (config: Record<string, any>) => {
-            if (!isApiLoadedRef.current) {
-                pendingConfigRef.current = config
-                return
-            }
+            if (!isApiLoadedRef.current) return
 
             if (!containerRef.current || initializingRef.current) return
             initializingRef.current = true
@@ -126,11 +126,7 @@ export const EditorPreview = ({
         script.async = true
         script.onload = () => {
             isApiLoadedRef.current = true
-            if (pendingConfigRef.current !== null) {
-                const pending = pendingConfigRef.current
-                pendingConfigRef.current = null
-                initEditor(pending).catch(console.error)
-            }
+            onReadyRef.current?.()
         }
         script.onerror = () => console.error('Failed to load OnlyOffice API')
 

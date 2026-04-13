@@ -94,6 +94,10 @@
     flex-direction: column;
 }
 
+.TabPanel[data-state="active"] {
+    z-index: 1;
+}
+
 .TabPanel[hidden] {
     visibility: hidden;
     pointer-events: none;
