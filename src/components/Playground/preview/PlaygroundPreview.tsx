@@ -156,11 +156,16 @@ export const PlaygroundPreview = () => {
         return () => window.removeEventListener('playground-run', handleRun)
     }, [scriptValue, scriptType, executeCode])
 
+    const handleReady = useCallback(() => {
+        editorRef.current?.initEditor(buildConfig())
+    }, [buildConfig])
+
     return (
         <EditorPreview
             ref={editorRef}
             documentServerUrl={documentServerUrl}
             documentServerSecret={documentServerSecret}
+            onReady={handleReady}
         />
     )
 }

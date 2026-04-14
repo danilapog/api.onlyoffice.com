@@ -81,10 +81,12 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
                     </div>
                 </Tabs.Content>
                 <Tabs.Content value="json" className={styles.tabsContent}>
-                    <div className={styles.jsonTabWrapper}>
+                    <div className={styles.jsonHeader}>
                         <button className={styles.copyButton} onClick={handleCopy} type="button">
                             {copyLabel}
                         </button>
+                    </div>
+                    <div className={styles.jsonTabWrapper}>
                         <MonacoEditor
                             language="json"
                             value={jsonText}

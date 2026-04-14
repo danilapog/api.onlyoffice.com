@@ -13,6 +13,9 @@ The Config Editor is an interactive tool for configuring ONLYOFFICE Docs API ini
 - **JSON editor**. Directly edit or copy the raw configuration JSON.
 - **Live preview**. See your configuration applied instantly in an embedded document editor.
 
+```mdx-code-block
 import Link from '@docusaurus/Link'
+import { ConfigEditorCardsRow } from '@site/src/components/ConfigEditorCard'
 
-<Link className="button button--primary" to="/config-editor">Open Config Editor</Link>
+<ConfigEditorCardsRow />
+```

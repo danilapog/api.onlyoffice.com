@@ -56,23 +56,27 @@
 
 /* ── JSON tab ────────────────────────────────────── */
 
+.jsonHeader {
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    flex-shrink: 0;
+    background: var(--ifm-background-surface-color);
+}
+
 .jsonTabWrapper {
-    position: relative;
     flex: 1;
     overflow: hidden;
 }
 
 .copyButton {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 1;
-    padding: 4px 12px;
+    padding: 3px 10px;
     font-size: 12px;
     font-weight: 500;
     border-radius: 6px;
     border: 1px solid var(--ifm-toc-border-color);
-    background: var(--ifm-background-surface-color);
+    background: transparent;
     color: var(--ifm-font-color-base);
     cursor: pointer;
     transition: background 0.15s;
@@ -269,34 +273,63 @@
     flex-shrink: 0;
 }
 
-/* ── Nested object sections (details/summary accordion) ── */
+/* ── Object sections (flat heading tree, no borders) ── */
 
-.details {
-    border: 1px solid var(--ifm-toc-border-color);
-    border-radius: 8px;
-    margin-bottom: 12px;
+.section {
+    border: none;
+    border-top: 1px solid var(--ifm-toc-border-color);
+    border-radius: 0;
+    margin-bottom: 0;
     min-width: 0;
 }
 
-
-.summary {
+.summaryDepth1 {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 14px;
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--ifm-color-primary);
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ifm-font-color-base);
     text-transform: capitalize;
     cursor: pointer;
     user-select: none;
     list-style: none;
 }
 
-.summary::-webkit-details-marker {
-    display: none;
+.summaryDepth2 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ifm-font-color-base);
+    text-transform: capitalize;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
 }
 
+.summaryDepth3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ifm-color-secondary-darkest);
+    text-transform: capitalize;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+}
+
+.summaryDepth1::-webkit-details-marker,
+.summaryDepth2::-webkit-details-marker,
+.summaryDepth3::-webkit-details-marker {
+    display: none;
+}
 
 .chevron {
     flex-shrink: 0;
@@ -309,8 +342,8 @@
     transform: rotate(0deg);
 }
 
-.detailsContent {
-    padding: 0 14px 14px;
+.sectionContent {
+    padding: 0 0 12px;
 }
 
 
