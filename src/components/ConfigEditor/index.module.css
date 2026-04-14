@@ -4,48 +4,105 @@
     height: 100%;
     overflow: hidden;
     background: var(--ifm-background-color);
+    position: relative;
 }
 
-/* ── Toolbar ─────────────────────────────────────── */
+/* ── Tabs ────────────────────────────────────────── */
 
-.toolbar {
+.tabs {
+    flex: 1;
     display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 8px 12px;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tabsList {
+    display: flex;
     border-bottom: 1px solid var(--ifm-toc-border-color);
     background: var(--ifm-background-surface-color);
     flex-shrink: 0;
+    padding: 0 12px;
+    gap: 0;
 }
 
-.toolbarButton {
-    padding: 5px 14px;
+.tabsTrigger {
+    padding: 8px 16px;
     font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    color: var(--ifm-color-secondary-darkest);
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.tabsTrigger[data-state='active'] {
+    color: var(--ifm-color-primary);
+    border-bottom-color: var(--ifm-color-primary);
+}
+
+.tabsContent {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabsContent[data-state='inactive'] {
+    display: none;
+}
+
+/* ── JSON tab ────────────────────────────────────── */
+
+.jsonTabWrapper {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+.copyButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    padding: 4px 12px;
+    font-size: 12px;
     font-weight: 500;
     border-radius: 6px;
     border: 1px solid var(--ifm-toc-border-color);
-    background: var(--ifm-background-color);
+    background: var(--ifm-background-surface-color);
     color: var(--ifm-font-color-base);
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-    line-height: 1.4;
+    transition: background 0.15s;
 }
 
-.toolbarButton:hover {
+.copyButton:hover {
     background: var(--ifm-hover-overlay);
-    border-color: var(--ifm-color-primary);
 }
 
-.toolbarButtonPrimary {
+/* ── Apply button ────────────────────────────────── */
+
+.applyButton {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1;
+    height: 2.5rem;
+    padding: 0 1.5rem;
     background: var(--ifm-color-primary);
-    border-color: var(--ifm-color-primary);
     color: #fff;
+    border: none;
+    border-radius: var(--ifm-global-radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background var(--ifm-transition-fast) ease;
 }
 
-.toolbarButtonPrimary:hover {
+.applyButton:hover {
     background: var(--ifm-color-primary-dark);
-    border-color: var(--ifm-color-primary-dark);
-    color: #fff;
 }
 
 /* ── Form wrapper (scrollable) ───────────────────── */
@@ -304,6 +361,24 @@
 .arrayRemoveButton:hover {
     border-color: var(--ifm-color-danger);
     background: var(--ifm-color-danger-lightest, rgba(250,56,62,.08));
+}
+
+.toolbarButton {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.4;
+}
+
+.toolbarButton:hover {
+    background: var(--ifm-hover-overlay);
+    border-color: var(--ifm-color-primary);
 }
 
 .arrayAddButton {

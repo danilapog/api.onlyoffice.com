@@ -1,7 +1,10 @@
 import { JsonForms } from '@jsonforms/react'
 import type { JsonSchema } from '@jsonforms/core'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
+import * as Tabs from '@radix-ui/react-tabs'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import MonacoEditor from '@monaco-editor/react'
+import { useColorMode } from '@docusaurus/theme-common/internal'
 import schema from '@site/static/schemas/config.json'
 import { renderers } from './renderers'
 import { populateDefaults } from './utils/populateDefaults'
@@ -13,37 +16,42 @@ interface ConfigEditorProps {
 }
 
 export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
+    const { colorMode } = useColorMode()
+
     const initialFormData = useMemo(
         () => populateDefaults(schema as JsonSchema, defaultConfig, schema as JsonSchema) as Record<string, unknown>,
         [defaultConfig],
     )
 
     const [formData, setFormData] = useState<Record<string, unknown>>(initialFormData)
+    const [jsonText, setJsonText] = useState(() => JSON.stringify(initialFormData, null, 2))
     const [copyLabel, setCopyLabel] = useState('Copy')
 
-    // Re-sync local form state and re-init the preview whenever the merged
-    // defaults change (e.g. after `useColorMode()` hydrates from undefined to
-    // 'light'/'dark'). `onApply` is intentionally not in the deps — including
-    // it would re-fire on every parent render.
     useEffect(() => {
         setFormData(initialFormData)
+        setJsonText(JSON.stringify(initialFormData, null, 2))
         onApply(initialFormData)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialFormData])
 
-    const handleImport = async () => {
+    const handleFormChange = useCallback(({ data }: { data: Record<string, unknown> }) => {
+        const updated = data ?? {}
+        setFormData(updated)
+        setJsonText(JSON.stringify(updated, null, 2))
+    }, [])
+
+    const handleJsonChange = useCallback((value: string) => {
+        setJsonText(value)
         try {
-            const text = await navigator.clipboard.readText()
-            const parsed = JSON.parse(text)
+            const parsed = JSON.parse(value)
             setFormData(parsed)
         } catch {
-            alert('Failed to read JSON from clipboard. Make sure you have valid JSON copied.')
+            // invalid JSON — keep current formData
         }
-    }
+    }, [])
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(JSON.stringify(formData, null, 2))
+            await navigator.clipboard.writeText(jsonText)
             setCopyLabel('Copied!')
             setTimeout(() => setCopyLabel('Copy'), 2000)
         } catch {
@@ -51,42 +59,57 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
         }
     }
 
-    const handleReset = () => {
-        setFormData(initialFormData)
-    }
-
-    const handleApply = () => {
-        onApply(formData)
-    }
-
     return (
         <Tooltip.Provider delayDuration={200}>
         <div className={styles.root}>
-            <div className={styles.toolbar}>
-                <button className={styles.toolbarButton} onClick={handleReset} type="button">
-                    Reset
-                </button>
-                <button className={styles.toolbarButton} onClick={handleImport} type="button">
-                    Import
-                </button>
-                <button className={styles.toolbarButton} onClick={handleCopy} type="button">
-                    {copyLabel}
-                </button>
-                <button className={`${styles.toolbarButton} ${styles.toolbarButtonPrimary}`} onClick={handleApply} type="button">
-                    Apply
-                </button>
-            </div>
-            <div className={styles.formWrapper}>
-                <div className={styles.form}>
-                    <JsonForms
-                        schema={schema as JsonSchema}
-                        data={formData}
-                        renderers={renderers}
-                        onChange={({ data }) => setFormData(data ?? {})}
-                        validationMode="NoValidation"
-                    />
-                </div>
-            </div>
+            <Tabs.Root defaultValue="form" className={styles.tabs}>
+                <Tabs.List className={styles.tabsList}>
+                    <Tabs.Trigger value="form" className={styles.tabsTrigger}>Form</Tabs.Trigger>
+                    <Tabs.Trigger value="json" className={styles.tabsTrigger}>JSON</Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="form" className={styles.tabsContent}>
+                    <div className={styles.formWrapper}>
+                        <div className={styles.form}>
+                            <JsonForms
+                                schema={schema as JsonSchema}
+                                data={formData}
+                                renderers={renderers}
+                                onChange={handleFormChange}
+                                validationMode="NoValidation"
+                            />
+                        </div>
+                    </div>
+                </Tabs.Content>
+                <Tabs.Content value="json" className={styles.tabsContent}>
+                    <div className={styles.jsonTabWrapper}>
+                        <button className={styles.copyButton} onClick={handleCopy} type="button">
+                            {copyLabel}
+                        </button>
+                        <MonacoEditor
+                            language="json"
+                            value={jsonText}
+                            onChange={(v) => handleJsonChange(v ?? '')}
+                            theme={colorMode === 'dark' ? 'vs-dark' : 'vs-light'}
+                            options={{
+                                minimap: {enabled: false},
+                                scrollBeyondLastLine: false,
+                                fontSize: 14,
+                                lineNumbers: 'on',
+                                renderLineHighlight: 'all',
+                                automaticLayout: true,
+                                fixedOverflowWidgets: true,
+                            }}
+                        />
+                    </div>
+                </Tabs.Content>
+            </Tabs.Root>
+            <button
+                className={styles.applyButton}
+                onClick={() => onApply(formData)}
+                type="button"
+            >
+                Apply
+            </button>
         </div>
         </Tooltip.Provider>
     )

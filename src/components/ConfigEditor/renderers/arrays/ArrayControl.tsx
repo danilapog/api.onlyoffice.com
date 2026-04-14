@@ -43,7 +43,7 @@ function ArrayControlRenderer({
     handleChange,
     renderers,
 }: ArrayControlProps) {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(true)
 
     if (!visible || !schema) return null
 
@@ -53,7 +53,7 @@ function ArrayControlRenderer({
     const parentScope = uischema.scope
 
     return (
-        <details className={styles.details} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+        <details open className={styles.details} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
             <summary className={styles.summary}>
                 <Chevron open={open} />
                 {label}

@@ -6,7 +6,7 @@ import { InfoTooltip } from '../../utils/InfoTooltip'
 import styles from '../../index.module.css'
 
 function ObjectLayoutRenderer({ schema, path, visible, renderers, cells, uischema }: ControlProps) {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(true)
 
     if (!visible) return null
 
@@ -37,7 +37,7 @@ function ObjectLayoutRenderer({ schema, path, visible, renderers, cells, uischem
     const description = schema.description
 
     return (
-        <details className={styles.details} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+        <details open className={styles.details} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
             <summary className={styles.summary}>
                 <Chevron open={open} />
                 {title}

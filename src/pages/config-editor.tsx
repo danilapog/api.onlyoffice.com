@@ -1,4 +1,5 @@
 import Head from '@docusaurus/Head'
+import BrowserOnly from '@docusaurus/BrowserOnly'
 import { ColorModeProvider, useColorMode } from '@docusaurus/theme-common/internal'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { useMemo, useRef } from 'react'
@@ -85,7 +86,9 @@ const ConfigEditorInner = () => {
 const ConfigEditorRoute = () => (
     <ColorModeProvider>
         <Head>Config Editor | ONLYOFFICE</Head>
-        <ConfigEditorInner />
+        <BrowserOnly fallback={null}>
+            {() => <ConfigEditorInner />}
+        </BrowserOnly>
     </ColorModeProvider>
 )
 
