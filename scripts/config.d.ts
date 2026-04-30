@@ -3030,6 +3030,7 @@ interface BaseConfig {
     /**
      * Defines the document width in the browser window.
      * @default "100%"
+     * @pattern '/^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/'
      * @forType `desktop` | `mobile` | `embedded`
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/#width
      */
@@ -3038,6 +3039,7 @@ interface BaseConfig {
     /**
      * Defines the document height in the browser window.
      * @default "100%"
+     * @pattern '/^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/'
      * @forType `desktop` | `mobile` | `embedded`
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/#height
      */
