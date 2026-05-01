@@ -775,21 +775,7 @@ interface DocumentNormal extends DocumentBase {
 
 interface DocumentEmbedded extends DocumentBase {}
 
-interface EditorConfigBase {
-    // TODO: Not in the documentation
-    /**
-     * @forType `desktop` | `mobile` | `embedded`
-     */
-    licenseUrl?: string;
-
-    // TODO: Not in the documentation
-    /**
-     * @forType `desktop` | `mobile` | `embedded`
-     */
-    customerId?: string;
-}
-
-interface EditorConfigNormal extends EditorConfigBase {
+interface EditorConfigNormal {
     /**
      * Specifies the data received from the **document editing service** using the `onMakeActionLink` event or the `onRequestSendNotify` event in `data.actionLink` parameter, which contains the information about the action in the document that will be scrolled to.
      * @forType `desktop` | `mobile`
@@ -2300,7 +2286,7 @@ interface EditorConfigNormal extends EditorConfigBase {
     };
 }
 
-interface EditorConfigEmbedded extends EditorConfigBase {
+interface EditorConfigEmbedded {
     // TODO: Not in the documentation
     /**
      * Defines the action for application autostart.
