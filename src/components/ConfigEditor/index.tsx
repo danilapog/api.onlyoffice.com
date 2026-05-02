@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { CopyButton } from "./renderers/utils/CopyButton";
 import { flushPendingInput } from "./renderers/controls/TextControl";
+import { sortObjectKeys } from "./renderers/utils/fieldSort";
 
 interface ConfigEditorProps {
     defaultConfig: Record<string, unknown>;
@@ -58,7 +59,14 @@ export function ConfigEditor({ defaultConfig, onApply }: ConfigEditorProps) {
     }, []);
 
     const serializeConfig = useCallback(() => {
-        return JSON.stringify(formDataRef.current, null, 2);
+        const data = formDataRef.current;
+        const schemaProps = (schema as any).properties as Record<string, any> | undefined;
+        const sortedKeys = sortObjectKeys(Object.keys(data), '', schemaProps);
+        const sorted: Record<string, unknown> = {};
+        for (const key of sortedKeys) {
+            sorted[key] = data[key];
+        }
+        return JSON.stringify(sorted, null, 2);
     }, []);
 
     const syncJson = useCallback(() => {
