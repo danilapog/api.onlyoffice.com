@@ -330,6 +330,8 @@ interface RequestReferenceSourceEvent {
 interface SharingSetting {
     /**
      * The name of the user the document will be shared with.
+     * @minLength 1
+     * @maxLength 128
      * @example "John Smith"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/document/info/#sharingsettingsuser
      */
@@ -566,6 +568,8 @@ interface RecentDocument {
     /**
      * The document title that will be displayed in the **Open Recent...** menu option.
      *
+     * @minLength 1
+     * @maxLength 128
      * @example "exampledocument1.docx"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#recenttitle
      */
@@ -574,6 +578,7 @@ interface RecentDocument {
     /**
      * The absolute URL to the document where it is stored.
      *
+     * @format uri
      * @example "https://example.com/exampledocument1.docx"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#recenturl
      */
@@ -582,6 +587,7 @@ interface RecentDocument {
     /**
      * The folder where the document is stored (can be empty if the document is in the root folder).
      *
+     * @maxLength 256
      * @example "Example Files"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#recentfolder
      */
@@ -592,6 +598,8 @@ interface DocumentTemplate {
     /**
      * The template title that will be displayed in the **Create New...** menu option.
      *
+     * @minLength 1
+     * @maxLength 128
      * @example "exampletemplate1.docx"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#templatestitle
      */
@@ -600,6 +608,7 @@ interface DocumentTemplate {
     /**
      * The absolute URL to the image for the template.
      *
+     * @format uri
      * @example "https://example.com/exampletemplate1.png"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#templatesimage
      */
@@ -608,6 +617,7 @@ interface DocumentTemplate {
     /**
      * The absolute URL to the document where it will be created and available after creation.
      *
+     * @format uri
      * @example "https://example.com/url-to-create-template1"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#templatesurl
      */
@@ -628,6 +638,7 @@ interface ReferenceData {
      * The unique system identifier. 
      * 
      * @note If the data was copied from a file on one system, and inserted into a file on another, then pasting by link will not be available and there will be no corresponding button in the context menu.
+     * @format uri
      * @example "https://example.com"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/document/#referencedatainstanceid
      */
@@ -663,6 +674,7 @@ interface DocumentBase {
      * Defines the absolute URL where the source viewed or edited document is stored.
      * @forType `desktop` | `mobile` | `embedded`
      * @note Be sure to add a token when using local links. Otherwise, an error will occur.
+     * @format uri
      * @example "https://example.com/url-to-example-document.docx"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/document/#url
      */
@@ -719,6 +731,8 @@ interface DocumentNormal extends DocumentBase {
     info?: {
         /**
          * Defines the name of the document owner/creator.
+         * @minLength 1
+         * @maxLength 128
          * @example "John Smith"
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/document/info/#owner
          */
@@ -726,6 +740,7 @@ interface DocumentNormal extends DocumentBase {
 
         /**
          * Defines the folder where the document is stored (can be empty in case the document is stored in the root folder).
+         * @maxLength 256
          * @example "Example Files"
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/document/info/#folder
          */
@@ -814,6 +829,9 @@ interface EditorConfigNormal extends EditorConfigBase {
      * 
      * @forType `desktop` | `mobile`
      * @default "en"
+     * @minLength 2
+     * @maxLength 35
+     * @pattern '/^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i'
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#lang
      */
     lang?: string;
@@ -849,6 +867,7 @@ interface EditorConfigNormal extends EditorConfigBase {
      * - Instead of this parameter, you can use the `onRequestCreateNew` event.  
      *
      * @forType `desktop` | `mobile`
+     * @format uri
      * @example "https://example.com/url-to-create-document"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#createurl
      */
@@ -857,12 +876,14 @@ interface EditorConfigNormal extends EditorConfigBase {
     // TODO: Not in the documentation
     /**
      * @forType `desktop` | `mobile`
+     * @format uri
      */
     sharingSettingsUrl?: string;
 
     // TODO: Not in the documentation
     /**
      * @forType `desktop` | `mobile`
+     * @format uri
      */
     fileChoiceUrl?: string;
 
@@ -872,6 +893,7 @@ interface EditorConfigNormal extends EditorConfigBase {
      * - Url for connection between sdk and portal.
      *
      * @forType `desktop` | `mobile`
+     * @format uri
      * @example "https://example.com/url-to-callback"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#callbackurl
      */
@@ -880,12 +902,14 @@ interface EditorConfigNormal extends EditorConfigBase {
     // TODO: Not in the documentation
     /**
      * @forType `desktop` | `mobile`
+     * @format uri
      */
     mergeFolderUrl?: string;
 
     // TODO: Not in the documentation
     /**
      * @forType `desktop` | `mobile`
+     * @format uri
      */
     saveAsUrl?: string;
 
@@ -900,6 +924,9 @@ interface EditorConfigNormal extends EditorConfigBase {
      * @defaultValue 
      * - If not specified, the value of the `lang` parameter is used.  
      * - If no regional setting corresponds to the `lang` value, `"en-US"` is applied by default.  
+     * @minLength 5
+     * @maxLength 10
+     * @pattern '/^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i'
      * @example "en-US"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#region
      */
@@ -942,6 +969,7 @@ interface EditorConfigNormal extends EditorConfigBase {
         /**
          * The group (or several groups separated with commas) the user belongs to.
          * Can be used for `customization.reviewPermissions`, `permissions.reviewGroups`, or `permissions.commentGroups`.
+         * @maxLength 256
          * @example "Group1,Group2"
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#usergroup
          */
@@ -950,6 +978,7 @@ interface EditorConfigNormal extends EditorConfigBase {
         /**
          * The path to the user's avatar.
          *
+         * @format uri
          * @example "https://example.com/url-to-user-avatar.png"
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#userimage
          */
@@ -997,6 +1026,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * Path to the image file used to show in the common work mode (view and edit modes for all editors) or in the embedded mode.  
              * The image must have the following size: **172x40**.  
              *
+             * @format uri
              * @example "https://example.com/logo.png"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#logoimage
              */
@@ -1006,6 +1036,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * Path to the image file used for the dark header (for example, in a dark theme or in a theme with a colored header).
              * The image must have the following size: **172x40**.  
              *
+             * @format uri
              * @example "https://example.com/dark-logo.png"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#logoimagedark
              */
@@ -1015,6 +1046,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * Path to the image file used for the **light header** (for example, in the Gray theme).  
              * The image must have the following size: **172x40**.  
              *
+             * @format uri
              * @example "https://example.com/light-logo.png"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#logoimagelight
              */
@@ -1059,6 +1091,8 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * The name of the company or person who gives access to the editors or the editor authors.
              *
+             * @minLength 1
+             * @maxLength 128
              * @example "John Smith and Co."
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customername
              */
@@ -1067,6 +1101,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * Postal address of the company or person who gives access to the editors or the editor authors.
              *
+             * @maxLength 256
              * @example "My City, 123a-45"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customeraddress
              */
@@ -1075,6 +1110,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * Email address of the company or person who gives access to the editors or the editor authors.
              *
+             * @format email
              * @example "john@example.com"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customermail
              */
@@ -1083,6 +1119,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * Home website address of the above company or person.
              *
+             * @maxLength 256
              * @example "example.com"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerwww
              */
@@ -1091,6 +1128,8 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * The phone of the company or person who gives access to the editors or the editor authors.
              *
+             * @maxLength 32
+             * @pattern '/^\+?[\d\s\-\(\)]{7,20}$/'
              * @example "123456789"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerphone
              */
@@ -1099,6 +1138,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * Some additional information about the company or person you want the others to know.
              *
+             * @maxLength 512
              * @example "Some additional information"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerinfo
              */
@@ -1109,6 +1149,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * - No special recommendations for this file, but it is recommended to use **.png** format with a transparent background.  
              * - The image must have the following size: **432x70**.  
              *
+             * @format uri
              * @example "https://example.com/logo-big.png"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerlogo
              */
@@ -1119,6 +1160,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * - No special recommendations for this file, but it is recommended to use **.png** format with a transparent background.  
              * - The image must have the following size: **432x70**.  
              *
+             * @format uri
              * @example "https://example.com/dark-logo-big.png"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerlogodark
              */
@@ -1153,6 +1195,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * The absolute URL to the website which will be opened when clicking the **Feedback & Support** menu button.
              *
+             * @format uri
              * @example "https://example.com"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#feedbackurl
              */
@@ -1185,6 +1228,8 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * The text which will be displayed for the **Open file location** menu button and upper right corner button (i.e. instead of Go to Documents).
              *
+             * @minLength 1
+             * @maxLength 128
              * @example "Open file location"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#gobacktext
              */
@@ -1193,6 +1238,7 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * The absolute URL to the website which will be opened when clicking the **Open file location** menu button.
              *
+             * @format uri
              * @example "https://example.com"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#gobackurl
              */
@@ -1219,6 +1265,8 @@ interface EditorConfigNormal extends EditorConfigBase {
              * @note It will only be available if the `onRequestClose` event is set. If the event is not declared and the `close` parameter is not specified, the cross button will not be displayed.  
              * @note This parameter is also available for the mobile editors.
              *
+             * @minLength 1
+             * @maxLength 128
              * @example "Close file"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#closetext
              */
@@ -1246,6 +1294,8 @@ interface EditorConfigNormal extends EditorConfigBase {
              * A postfix added to the user name.
              *
              * @default "Guest"
+             * @minLength 1
+             * @maxLength 128
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#anonymouslabel
              */
             label?: string;
@@ -1729,12 +1779,16 @@ interface EditorConfigNormal extends EditorConfigBase {
         font?: {
             /**
              * The font name.
+             * @minLength 1
+             * @maxLength 128
              * @example "Arial"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-white-label/#fontname
              */
             name?: string;
 
-            /** The font size.
+            /**
+             * The font size.
+             * @pattern '/^\d+(\.\d+)?(px|pt|em|rem|%)$/'
              * @example "11px"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-white-label/#fontsize
              */
@@ -2145,6 +2199,7 @@ interface EditorConfigNormal extends EditorConfigBase {
          * Starting from version 8.3,
          *
          * @default "#000000"
+         * @pattern '/^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0(?:\.\d+)?|1(?:\.0+)?)\s*\))$/'
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#slideplayerbackground
          */
         slidePlayerBackground?: string;
@@ -2154,6 +2209,7 @@ interface EditorConfigNormal extends EditorConfigBase {
          * Starting from version 8.3
          *
          * @default "#00ff00"
+         * @pattern '/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#wordheadingscolor
          */
         wordHeadingsColor?: string;
@@ -2181,6 +2237,8 @@ interface EditorConfigNormal extends EditorConfigBase {
             /**
              * Caption of the start filling button, used for **PDF Forms**
              * @default "Share & collect"
+             * @minLength 1
+             * @maxLength 128
              */
             text?: string;
         }
@@ -2315,9 +2373,21 @@ interface EditorConfigEmbedded extends EditorConfigBase {
      */
     embedded?: {
         // TODO: Not in the documentation
+        /**
+         * @format uri
+         */
         embedUrl?: string;
+        /**
+         * @format uri
+         */
         fullscreenUrl?: string;
+        /**
+         * @format uri
+         */
         saveUrl?: string;
+        /**
+         * @format uri
+         */
         shareUrl?: string;
         toolbarDocked?: "top" | "bottom";
     };
