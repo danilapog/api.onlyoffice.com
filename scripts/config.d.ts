@@ -831,7 +831,7 @@ interface EditorConfigNormal extends EditorConfigBase {
      * @default "en"
      * @minLength 2
      * @maxLength 35
-     * @pattern '/^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i'
+     * @pattern /^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#lang
      */
     lang?: string;
@@ -926,7 +926,7 @@ interface EditorConfigNormal extends EditorConfigBase {
      * - If no regional setting corresponds to the `lang` value, `"en-US"` is applied by default.  
      * @minLength 5
      * @maxLength 10
-     * @pattern '/^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i'
+     * @pattern /^[a-z]{2,3}(?:-[a-z0-9]{1,8})*$/i
      * @example "en-US"
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/#region
      */
@@ -1129,7 +1129,7 @@ interface EditorConfigNormal extends EditorConfigBase {
              * The phone of the company or person who gives access to the editors or the editor authors.
              *
              * @maxLength 32
-             * @pattern '/^\+?[\d\s\-\(\)]{7,20}$/'
+             * @pattern /^\+?[\d\s\-\(\)]{7,20}$/
              * @example "123456789"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#customerphone
              */
@@ -1788,7 +1788,7 @@ interface EditorConfigNormal extends EditorConfigBase {
 
             /**
              * The font size.
-             * @pattern '/^\d+(\.\d+)?(px|pt|em|rem|%)$/'
+             * @pattern /^\d+(\.\d+)?(px|pt|em|rem|%)$/
              * @example "11px"
              * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-white-label/#fontsize
              */
@@ -2199,7 +2199,7 @@ interface EditorConfigNormal extends EditorConfigBase {
          * Starting from version 8.3,
          *
          * @default "#000000"
-         * @pattern '/^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0(?:\.\d+)?|1(?:\.0+)?)\s*\))$/'
+         * @pattern /^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0(?:\.\d+)?|1(?:\.0+)?)\s*\))$/
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#slideplayerbackground
          */
         slidePlayerBackground?: string;
@@ -2209,7 +2209,7 @@ interface EditorConfigNormal extends EditorConfigBase {
          * Starting from version 8.3
          *
          * @default "#00ff00"
-         * @pattern '/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'
+         * @pattern /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
          * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/editor/customization/customization-standard-branding/#wordheadingscolor
          */
         wordHeadingsColor?: string;
@@ -3100,7 +3100,7 @@ interface BaseConfig {
     /**
      * Defines the document width in the browser window.
      * @default "100%"
-     * @pattern '/^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/'
+     * @pattern /^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/
      * @forType `desktop` | `mobile` | `embedded`
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/#width
      */
@@ -3109,7 +3109,7 @@ interface BaseConfig {
     /**
      * Defines the document height in the browser window.
      * @default "100%"
-     * @pattern '/^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/'
+     * @pattern /^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh|vmin|vmax)|calc\(([^)]+)\)$/
      * @forType `desktop` | `mobile` | `embedded`
      * @see https://api.onlyoffice.com/docs/docs-api/usage-api/config/#height
      */
