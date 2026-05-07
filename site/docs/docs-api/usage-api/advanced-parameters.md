@@ -241,6 +241,10 @@ const config = {
         "asc.{0616AE85-5DBE-4B6B-A0A9-455C4F1503AD}",
         "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
       ],
+      disable: [
+        "asc.{B1E396DA-FA61-4B84-97AE-5F1A05C28AB9}",
+        "asc.{0D691BCC-6745-4F0C-A9D8-2B8C35E1A3F0}",
+      ],
       options: {
         "all": {
           keyAll: "valueAll",

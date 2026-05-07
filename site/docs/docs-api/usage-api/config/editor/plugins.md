@@ -10,6 +10,14 @@ Defines the array of plugin identifiers from the [config.json](../../../../plugi
 
 **Example**: `["asc.{7327FC95-16DA-41D9-9AF2-0E7F449F6800}"]`
 
+## disable
+
+**type:** `string[]`
+
+Defines the array of plugin identifiers that will be blocked when the editor loads. The specified plugins will not be available in the editor interface.
+
+**Example**: `["asc.{B1E396DA-FA61-4B84-97AE-5F1A05C28AB9}"]`
+
 ## options
 
 **type:** `object`
@@ -77,6 +85,9 @@ const config = {
     plugins: {
       autostart: [
         "asc.{7327FC95-16DA-41D9-9AF2-0E7F449F6800}",
+      ],
+      disable: [
+        "asc.{B1E396DA-FA61-4B84-97AE-5F1A05C28AB9}",
       ],
       options: {
         "all": {
