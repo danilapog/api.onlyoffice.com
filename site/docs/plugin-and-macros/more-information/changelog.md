@@ -6,6 +6,22 @@ sidebar_position: -1
 
 The list of changes for ONLYOFFICE Plugins and Macros API.
 
+## Version 9.4
+
+- Added the [MoveCursorToField](../interacting-with-editors/document-api/Methods/MoveCursorToField.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
+- Added the [MoveCursorOutsideField](../interacting-with-editors/document-api/Methods/MoveCursorOutsideField.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
+- Updated the [StartAction](../interacting-with-editors/document-api/Methods/StartAction.md) method to *window\.Asc.plugin.executeMethod* for Document Api: added the *lockScroll* and *keepSelection* parameters to the *GroupActions* pr object.
+- Updated the [EndAction](../interacting-with-editors/document-api/Methods/EndAction.md) method to *window\.Asc.plugin.executeMethod* for Document Api: added the *scrollToTarget* and *cancel* parameters to the *GroupActions* pr object.
+- Added the *ApiSignatureForm* class to Form Api.
+- Added the [GetImage](../interacting-with-editors/form-api/Methods/GetImage.md) method for *ApiSignatureForm* in Form Api.
+- Added the [SetImage](../interacting-with-editors/form-api/Methods/SetImage.md) method for *ApiSignatureForm* in Form Api.
+- Added the [CreateSignatureForm](../interacting-with-editors/form-api/Methods/CreateSignatureForm.md) method to Form Api.
+- Added the [IsFilled](../interacting-with-editors/form-api/Methods/IsFilled.md) method for *ApiFormBase* in Form Api.
+- Added the [GetFormsHighlight](../interacting-with-editors/document-api/Methods/GetFormsHighlight.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
+- Added the [GetControlsHighlight](../interacting-with-editors/document-api/Methods/GetControlsHighlight.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
+- Added the [SetColor](../interacting-with-editors/document-api/Methods/SetColor.md) and [GetColor](../interacting-with-editors/document-api/Methods/GetColor.md) methods for *ApiInlineLvlSdt* and *ApiBlockLvlSdt* in Document Api.
+- Added the [GoToPage](../interacting-with-editors/document-api/Methods/GoToPage.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
+
 ## Version 9.3
 
 - Added the [SelectAddinField](../interacting-with-editors/document-api/Methods/SelectAddinField.md) method to *window\.Asc.plugin.executeMethod* for Document Api.
