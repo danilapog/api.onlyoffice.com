@@ -15,14 +15,14 @@ on:
         - testing
         - production
       site-publish:
-        description: 'deploy site?'
+        description: 'Want deploy site?'
         required: true
         default: true
         type: boolean
       lambda-publish:
-        description: 'update lambda?'
+        description: 'Want update lambda?'
         required: true
-        default: true
+        default: false
         type: boolean
       chinese:
         description: 'Build chinese?'
@@ -70,6 +70,8 @@ jobs:
           echo "BUCKET_A=${com_s3bucket_1}" >> "$GITHUB_ENV"
           echo "BUCKET_B=${com_s3bucket_2}" >> "$GITHUB_ENV"
           echo "LAMBDA_SRC_DIR=src-prod"    >> "$GITHUB_ENV"
+          echo "LAMBDA_NAME=api-site-redirects-prod" >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf-prod/tf-resources" >> "$GITHUB_ENV"
         elif [ "${mode}" = "testing" ]; then
           echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_TEST}"     >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_TEST}" >> "$GITHUB_ENV"
@@ -78,6 +80,8 @@ jobs:
           echo "BUCKET_A=${teamlab_s3bucket_1}" >> "$GITHUB_ENV"
           echo "BUCKET_B=${teamlab_s3bucket_2}" >> "$GITHUB_ENV"
           echo "LAMBDA_SRC_DIR=src-dev"        >> "$GITHUB_ENV"
+          echo "LAMBDA_NAME=api-site-redirects-test" >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf-test/tf-resources" >> "$GITHUB_ENV"
         else
           echo "Invalid site mode: $mode"
           exit 1
@@ -102,7 +106,7 @@ jobs:
     # бакет, и только в самом конце переключим CF.
     - name: Get current active bucket from CF state
       id: get_bucket
-      working-directory: cf
+      working-directory: ${{ env.CF_TF_DIR }}
       run: |
         terraform init -input=false -no-color
         CURRENT_BUCKET="$(terraform output -raw api_site_origin_bucket)"
@@ -128,11 +132,12 @@ jobs:
     - name: Deploy lambda (terraform apply)
       id: lambda
       if: ${{ env.LAMBDA_PUBLISH == 'true' }}
-      working-directory: api-site-redirects/tf-resources
+      working-directory: .github/api-site-redirects/tf-resources
       run: |
         terraform init -input=false -no-color
         terraform apply -auto-approve -input=false -no-color \
-          -var="lambda_source_path=../${LAMBDA_SRC_DIR}"
+          -var="lambda_source_path=../${LAMBDA_SRC_DIR}" \
+          -var="lambda_name=${LAMBDA_NAME}
 
     # ---------------- Site build & sync (опционально) ----------------
     - name: Install nodejs
@@ -249,7 +254,7 @@ jobs:
     - name: Update CloudFront (terraform apply)
       id: cfconf
       if: ${{ env.SITE_PUBLISH == 'true' && steps.sync.outcome == 'success' }}
-      working-directory: cf
+      working-directory: ${{ env.CF_TF_DIR }}
       run: |
         terraform apply -auto-approve -input=false -no-color \
           -var="api_site_s3_bucket_name=${TARGET_BUCKET}"
