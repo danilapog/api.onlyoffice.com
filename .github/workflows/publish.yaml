@@ -63,25 +63,23 @@ jobs:
         AWS_DISTRIBUTION_ID_TEST: ${{ secrets.AWS_DISTRIBUTION_ID_TEST }}
       run: |
         if [ "${mode}" = "production" ]; then
-          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_PROD}"     >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_PROD}" >> "$GITHUB_ENV"
-          echo "AWS_REGION=us-east-1"                         >> "$GITHUB_ENV"
-          echo "AWS_DISTRIBUTION_ID=${AWS_DISTRIBUTION_ID_PROD}" >> "$GITHUB_ENV"
-          echo "BUCKET_A=${com_s3bucket_1}" >> "$GITHUB_ENV"
-          echo "BUCKET_B=${com_s3bucket_2}" >> "$GITHUB_ENV"
-          echo "LAMBDA_SRC_DIR=src-prod"    >> "$GITHUB_ENV"
-          echo "LAMBDA_NAME=api-site-redirects-prod" >> "$GITHUB_ENV"
-          echo "CF_TF_DIR=.github/cf/prod" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_PROD}"           >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_PROD}"       >> "$GITHUB_ENV"
+          echo "AWS_REGION=us-east-1"                               >> "$GITHUB_ENV"
+          echo "AWS_DISTRIBUTION_ID=${AWS_DISTRIBUTION_ID_PROD}"    >> "$GITHUB_ENV"
+          echo "BUCKET_A=${com_s3bucket_1}"                         >> "$GITHUB_ENV"
+          echo "BUCKET_B=${com_s3bucket_2}"                         >> "$GITHUB_ENV"
+          echo "LAMBDA_TF_DIR=.github/api-site-redirects/prod/tf"   >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf/prod"                          >> "$GITHUB_ENV"
         elif [ "${mode}" = "testing" ]; then
-          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_TEST}"     >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_TEST}" >> "$GITHUB_ENV"
-          echo "AWS_REGION=us-east-1"                         >> "$GITHUB_ENV"
-          echo "AWS_DISTRIBUTION_ID=${AWS_DISTRIBUTION_ID_TEST}" >> "$GITHUB_ENV"
-          echo "BUCKET_A=${teamlab_s3bucket_1}" >> "$GITHUB_ENV"
-          echo "BUCKET_B=${teamlab_s3bucket_2}" >> "$GITHUB_ENV"
-          echo "LAMBDA_SRC_DIR=src-dev"        >> "$GITHUB_ENV"
-          echo "LAMBDA_NAME=api-site-redirects-test" >> "$GITHUB_ENV"
-          echo "CF_TF_DIR=.github/cf/test" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_TEST}"           >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_TEST}"       >> "$GITHUB_ENV"
+          echo "AWS_REGION=us-east-1"                               >> "$GITHUB_ENV"
+          echo "AWS_DISTRIBUTION_ID=${AWS_DISTRIBUTION_ID_TEST}"    >> "$GITHUB_ENV"
+          echo "BUCKET_A=${teamlab_s3bucket_1}"                     >> "$GITHUB_ENV"
+          echo "BUCKET_B=${teamlab_s3bucket_2}"                     >> "$GITHUB_ENV"
+          echo "LAMBDA_TF_DIR=.github/api-site-redirects/test/tf"   >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf/test"                          >> "$GITHUB_ENV"
         else
           echo "Invalid site mode: $mode"
           exit 1
@@ -122,22 +120,21 @@ jobs:
         fi
 
         echo "Target bucket for this deploy: ${TARGET_BUCKET}"
-        echo "CURRENT_BUCKET=${CURRENT_BUCKET}" >> "$GITHUB_ENV"
-        echo "TARGET_BUCKET=${TARGET_BUCKET}"   >> "$GITHUB_ENV"
+        echo "CURRENT_BUCKET=${CURRENT_BUCKET}"     >> "$GITHUB_ENV"
+        echo "TARGET_BUCKET=${TARGET_BUCKET}"       >> "$GITHUB_ENV"
         echo "AWS_BUCKET_URL=s3://${TARGET_BUCKET}" >> "$GITHUB_ENV"
 
     # ---------------- Lambda (опционально) ----------------
-    # Выбор src-dev / src-prod передаём в tf переменной lambda_source_path.
-    # В main.tf переменную надо ввести (см. комментарий после workflow).
+    # У каждого окружения своя папка с tf, своим backend key в providers.tf
+    # и своим lambda_name по умолчанию в variables.tf. Код берётся из ../src
+    # (захардкожено в main.tf), путь относительно tf-папки.
     - name: Deploy lambda (terraform apply)
       id: lambda
       if: ${{ env.LAMBDA_PUBLISH == 'true' }}
-      working-directory: .github/api-site-redirects/tf-resources
+      working-directory: ${{ env.LAMBDA_TF_DIR }}
       run: |
         terraform init -input=false -no-color
-        terraform apply -auto-approve -input=false -no-color \
-          -var="lambda_source_path=../${LAMBDA_SRC_DIR}" \
-          -var="lambda_name=${LAMBDA_NAME}"
+        terraform apply -auto-approve -input=false -no-color
 
     # ---------------- Site build & sync (опционально) ----------------
     - name: Install nodejs
@@ -247,10 +244,6 @@ jobs:
               --cache-control "$CACHE_CONTROL"
           done
 
-    # ---------------- Переключаем CF на новый бакет через terraform ----------------
-    # Запускается только если сайт реально пересобирали и залили в TARGET_BUCKET.
-    # terraform apply с -var=api_site_s3_bucket_name=<новый> обновит origin
-    # в CF и положит новый бакет в state как api_site_origin_bucket.
     - name: Update CloudFront (terraform apply)
       id: cfconf
       if: ${{ env.SITE_PUBLISH == 'true' && steps.sync.outcome == 'success' }}
@@ -260,7 +253,7 @@ jobs:
           -var="api_site_s3_bucket_name=${TARGET_BUCKET}"
 
     - name: Invalidate AWS CloudFront Cache
-      if: ${{ (env.SITE_PUBLISH == 'true' && steps.cfconf.outcome == 'success') || (env.LAMBDA_PUBLISH == 'true' && steps.lambda.outcome == 'success' && env.SITE_PUBLISH != 'true') }}
+      if: ${{ (env.SITE_PUBLISH == 'true' && steps.cfconf.outcome == 'success') || (env.LAMBDA_PUBLISH == 'true' && steps.lambda.outcome == 'success') }}
       run: |
         aws cloudfront create-invalidation --distribution-id ${AWS_DISTRIBUTION_ID} --paths '/*'
 
@@ -293,11 +286,9 @@ jobs:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         message: |
-            ${{ github.actor }} created commit:
-            Commit message: ${{ github.event.commits[0].message }}
+            Triggered by: ${{ github.actor }} (manual)
 
             Repository: ${{ github.repository }}
-            Action: ${{ github.event_name }}
             Workflow: ${{ github.workflow }}
             Mode: ${{ github.event.inputs.site_mode }}
             Site publish: ${{ github.event.inputs.site-publish }}
