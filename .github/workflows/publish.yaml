@@ -71,7 +71,7 @@ jobs:
           echo "BUCKET_B=${com_s3bucket_2}" >> "$GITHUB_ENV"
           echo "LAMBDA_SRC_DIR=src-prod"    >> "$GITHUB_ENV"
           echo "LAMBDA_NAME=api-site-redirects-prod" >> "$GITHUB_ENV"
-          echo "CF_TF_DIR=.github/cf-prod/tf-resources" >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf/prod" >> "$GITHUB_ENV"
         elif [ "${mode}" = "testing" ]; then
           echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_TEST}"     >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY_TEST}" >> "$GITHUB_ENV"
@@ -81,7 +81,7 @@ jobs:
           echo "BUCKET_B=${teamlab_s3bucket_2}" >> "$GITHUB_ENV"
           echo "LAMBDA_SRC_DIR=src-dev"        >> "$GITHUB_ENV"
           echo "LAMBDA_NAME=api-site-redirects-test" >> "$GITHUB_ENV"
-          echo "CF_TF_DIR=.github/cf-test/tf-resources" >> "$GITHUB_ENV"
+          echo "CF_TF_DIR=.github/cf/test" >> "$GITHUB_ENV"
         else
           echo "Invalid site mode: $mode"
           exit 1
@@ -137,7 +137,7 @@ jobs:
         terraform init -input=false -no-color
         terraform apply -auto-approve -input=false -no-color \
           -var="lambda_source_path=../${LAMBDA_SRC_DIR}" \
-          -var="lambda_name=${LAMBDA_NAME}
+          -var="lambda_name=${LAMBDA_NAME}"
 
     # ---------------- Site build & sync (опционально) ----------------
     - name: Install nodejs
